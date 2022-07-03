@@ -1,8 +1,7 @@
 'use strict';
 
-const { makeId } = require('core/makeid');
-const { testService } = require('./lib/testservice');
-const { testServices } = require('./lib/testservices');
+const { fork } = require('child_process');
+const { processOutage } = require('./lib/processoutage');
 
 const guiCluster = 'web service status';
 const icons = {
@@ -181,7 +180,29 @@ module.exports = {
       runAtBoot: true,
       active: true,
       interval: Number(settings.autotestInterval) * 60 * 1000,
-      action: () => testServices({ server, settings, makeId }),
+      action: async () => {
+        const services = await server
+          .storage
+          .store('smartyellow/webservice')
+          .find({ autotestEnabled: true })
+          .toArray();
+
+        if (!services.length) {
+          return;
+        }
+
+        const runtime = fork(__dirname + '/lib/runtime.js');
+        runtime.send({ command: 'testAll', services });
+
+        runtime.on('message', message => {
+          if (message.error) {
+            server.error(message.error);
+          }
+          else if (message.outage) {
+            processOutage({ outage: message.outage, server, settings });
+          }
+        });
+      },
     },
   ],
 
@@ -191,12 +212,24 @@ module.exports = {
       event: 'saveEntity',
       entity: [ 'smartyellow/webservice' ],
       purpose: 'Check whether services are up and send a notification if not.',
-      handler: ({ item }) => testService({
-        service: item,
-        server,
-        settings,
-        makeId,
-      }),
+      handler: ({ item }) => {
+        const runtime = fork(__dirname + '/lib/runtime.js');
+        runtime.send({ command: 'testOne', service: item });
+        runtime.on('message', message => {
+          if (message.error) {
+            server.error(message.error);
+          }
+          else if (message.outage) {
+            processOutage({
+              outage: {
+                [item.id]: message.outage,
+              },
+              server,
+              settings,
+            });
+          }
+        });
+      },
     },
   ],
 
