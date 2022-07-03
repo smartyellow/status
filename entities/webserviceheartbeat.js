@@ -23,7 +23,7 @@ module.exports = {
       default: () => makeId(6),
       validate: async ({ newValues, oldValues, newEntity, storage }) => {
         if (newEntity) {
-          const r = storage ? await storage.store('webdesq/blog').get(newValues.id) : null;
+          const r = storage ? await storage.store('smartyellow/webserviceheartbeat').get(newValues.id) : null;
           return (r == null ? true : 'id already exists');
         }
         else {

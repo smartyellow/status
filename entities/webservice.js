@@ -224,7 +224,7 @@ module.exports = {
       default: () => makeId(6),
       validate: async ({ newValues, oldValues, newEntity, storage }) => {
         if (newEntity) {
-          const r = storage ? await storage.store('webdesq/blog').get(newValues.id) : null;
+          const r = storage ? await storage.store('smartyellow/webservice').get(newValues.id) : null;
           return (r == null ? true : 'id already exists');
         }
         else {
@@ -238,6 +238,7 @@ module.exports = {
       type: 'stringset',
       trim: true,
       required: [ true, 'Name is missing!' ],
+      default: '',
       filter: {
         title: 'title',
         match: '^[a-zA-Z0-9]*',
