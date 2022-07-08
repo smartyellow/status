@@ -22,8 +22,9 @@
     "url": "https://github.com/smartyellow/status/issues"
   },
   "homepage": "https://github.com/smartyellow/status#readme",
-  "devDependencies": {
+  "dependencies": {
     "@sveltejs/vite-plugin-svelte": "^1.0.0-next.49",
+    "chokidar": "^3.5.3",
     "svelte": "^3.49.0",
     "vite": "^2.9.13"
   }

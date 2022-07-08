@@ -1,11 +1,13 @@
 'use strict';
 
 const { build: viteBuild } = require('vite');
-const { svelte } = require('@sveltejs/vite-plugin-svelte');
 const fs = require('fs').promises;
+const { svelte } = require('@sveltejs/vite-plugin-svelte');
+
+const path = __dirname + '/../gui/dashboard';
 
 const build = (prefix = '') => viteBuild({
-  root: __dirname + '/gui/dashboard/',
+  root: path,
   base: `${prefix}/statusdashboard/asset/`,
   plugins: [ svelte() ],
   build: {
@@ -16,14 +18,14 @@ const build = (prefix = '') => viteBuild({
         chunkFileNames: '[hash].js',
       },
     },
-    outDir: __dirname + '/gui/dashboard/build',
+    outDir: path + '/build',
   },
 });
 
-const cleanup = () => fs.rm(__dirname + '/gui/dashboard/build', {
+const cleanup = () => fs.rm(path + '/build', {
   recursive: true,
   force: true,
 });
 
-module.exports = { build, cleanup };
+module.exports = { build, cleanup, path };
 build();

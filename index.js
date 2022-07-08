@@ -127,6 +127,10 @@ module.exports = {
 
     await dashboard.cleanup();
     await dashboard.build(server.settings.prefix);
+
+    const dashWatcher = fork(__dirname + '/dashboard/watcher.js');
+    dashWatcher.send({ command: 'start', path: dashboard.path });
+
     return true;
   },
 
