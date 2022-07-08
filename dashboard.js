@@ -2,10 +2,11 @@
 
 const { build: viteBuild } = require('vite');
 const { svelte } = require('@sveltejs/vite-plugin-svelte');
+const fs = require('fs').promises;
 
-module.exports = () => viteBuild({
+const build = (prefix = '') => viteBuild({
   root: __dirname + '/gui/dashboard',
-  base: '.',
+  base: `${prefix}/statusdashboard/asset/`,
   plugins: [ svelte() ],
   build: {
     rollupOptions: {
@@ -19,4 +20,7 @@ module.exports = () => viteBuild({
   },
 });
 
-module.exports();
+const cleanup = () => fs.rmdir(__dirname + '/gui/dashboard/build');
+
+module.exports = { build, cleanup };
+build();

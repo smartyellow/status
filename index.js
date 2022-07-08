@@ -2,8 +2,7 @@
 
 const { fork } = require('child_process');
 const { processOutage } = require('./lib/processoutage');
-const buildDashboard = require('./builddashboard');
-const fs = require('fs').promises;
+const dashboard = require('./dashboard');
 
 const guiCluster = 'web service status';
 const icons = {
@@ -126,7 +125,8 @@ module.exports = {
       settings.autotestInterval = 10;
     }
 
-    await buildDashboard();
+    await dashboard.cleanup();
+    await dashboard.build(server.settings.prefix);
     return true;
   },
 
@@ -535,9 +535,14 @@ module.exports = {
     { route: '/statusdashboard',
       method: 'get',
       handler: async (req, res) => {
-        res.send(
-          (await fs.readFile(__dirname + '/gui/dashboard/build/index.html')).toString()
-        );
+        res.sendFile(__dirname + '/gui/dashboard/build/index.html');
+      },
+    },
+
+    { route: '/statusdashboard/asset/:file',
+      method: 'get',
+      handler: async (req, res) => {
+        res.sendFile(__dirname + `/gui/dashboard/build/${req.params[0]}`);
       },
     },
 
