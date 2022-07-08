@@ -2,6 +2,8 @@
 
 const { fork } = require('child_process');
 const { processOutage } = require('./lib/processoutage');
+const buildDashboard = require('./builddashboard');
+const fs = require('fs').promises;
 
 const guiCluster = 'web service status';
 const icons = {
@@ -117,13 +119,14 @@ module.exports = {
     },
   },
 
-  init: ({ server, settings }) => {
+  init: async ({ server, settings }) => {
     settings.autotestInterval = Number(settings.autotestInterval);
     if (Number.isNaN(settings.autotestInterval)) {
       server.warn('status: settings.autotestInterval is not a number. Using default value 10.');
       settings.autotestInterval = 10;
     }
 
+    await buildDashboard();
     return true;
   },
 
@@ -526,6 +529,15 @@ module.exports = {
         }
 
         res.json(result);
+      },
+    },
+
+    { route: '/statusdashboard',
+      method: 'get',
+      handler: async (req, res) => {
+        res.send(
+          (await fs.readFile(__dirname + '/gui/dashboard/build/index.html')).toString()
+        );
       },
     },
 

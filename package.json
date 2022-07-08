@@ -1,0 +1,30 @@
+{
+  "name": "status",
+  "version": "1.0.0",
+  "description": "Display status dashboard",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "build": "node builddashboard"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smartyellow/status.git"
+  },
+  "keywords": [
+    "status"
+  ],
+  "author": "Romein van Buren",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/smartyellow/status/issues"
+  },
+  "homepage": "https://github.com/smartyellow/status#readme",
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.49",
+    "svelte": "^3.49.0",
+    "vite": "^2.9.13"
+  }
+}
