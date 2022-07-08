@@ -21,8 +21,9 @@ module.exports = {
         { label: 'meta',
           sections: [
             'id',
-            'state',
             'name',
+            'state',
+            'public',
             'tags',
             'channels',
           ],
@@ -56,7 +57,6 @@ module.exports = {
             { key: 'id',
               editor: 'string',
               validator: '',
-              visible: false,
               readonly: true,
             },
           ],
@@ -80,6 +80,16 @@ module.exports = {
               editor: 'string',
               placeholder: 'service name',
               localized: true,
+            },
+          ],
+        },
+
+        public: {
+          label: 'is public?',
+          hint: 'If checked, this service will be shown on the status dashboard.',
+          fields: [
+            { key: 'public',
+              editor: 'checkbox',
             },
           ],
         },
@@ -353,6 +363,10 @@ module.exports = {
         match: '[a-z0-9A-Z]*',
         localized: true,
       },
+    },
+
+    autotest: {
+      default: [],
     },
 
     visual: {
