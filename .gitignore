@@ -4,4 +4,3 @@ node_modules
 config.custom.js
 config.temp.js
 package-lock.json
-/gui/dashboard/build/
