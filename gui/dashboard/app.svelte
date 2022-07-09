@@ -11,7 +11,7 @@
 </div>
 
 <style>
-  :global(html, body) {
+  :global(html), :global(body) {
     --radius: 10px;
     --tile-bg: #181818;
 

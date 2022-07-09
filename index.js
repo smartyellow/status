@@ -3,6 +3,7 @@
 const { fork } = require('child_process');
 const { processOutage } = require('./lib/processoutage');
 const buildDashboard = require('./builddashboard');
+const { minifyHtml } = require('core/strings');
 
 const guiCluster = 'web service status';
 const icons = {
@@ -537,7 +538,7 @@ module.exports = {
         if (!renderedDashboard) {
           renderedDashboard = await buildDashboard();
         }
-        const dashboardHtml = `
+        const dashboardHtml = minifyHtml(`
           <!DOCTYPE html>
           <html lang="en">
             <head>
@@ -550,7 +551,7 @@ module.exports = {
             </head>
             <body></body>
           </html>
-        `;
+        `);
         res.send(dashboardHtml);
       },
     },

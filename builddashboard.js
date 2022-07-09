@@ -1,37 +1,43 @@
 'use strict';
 
+const { minify: minifyCSS } = require('csso');
+const { rollup } = require('rollup');
+const commonjs = require('@rollup/plugin-commonjs');
+const css = require('rollup-plugin-css-only');
+const { default: resolve } = require('@rollup/plugin-node-resolve');
 const svelte = require('rollup-plugin-svelte');
 const { terser } = require('rollup-plugin-terser');
-const { rollup } = require('rollup');
-const { default: resolve } = require('@rollup/plugin-node-resolve');
-const commonjs = require('@rollup/plugin-commonjs');
-const { minify: minifyCSS } = require('csso');
 
 async function build() {
-  let cssOutput = { css: '', map: null };
+  let cssOutput = '';
 
   try {
     const bundle = await rollup({
       input: __dirname + '/gui/dashboard/index.js',
       plugins: [
+        // Svelte
         svelte({
-          emitCss: false,
           compilerOptions: {
             dev: false,
             generate: 'dom',
           },
-          preprocess: {
-            style: ({ content }) => {
-              cssOutput = minifyCSS(content);
-              return '';
-            },
-          },
         }),
+
+        // Extract CSS
+        css({
+          output: style => cssOutput = minifyCSS(style),
+        }),
+
+        // Resolve dependencies
         resolve({
           browser: true,
           dedupe: [ 'svelte' ],
         }),
+
+        // CommonJS functions
         commonjs(),
+
+        // Minify
         terser(),
       ],
     });
