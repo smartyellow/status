@@ -1,7 +1,7 @@
 'use strict';
 
 const svelte = require('rollup-plugin-svelte');
-const { terser } = require('rollup-plugin-terser')
+const { terser } = require('rollup-plugin-terser');
 const { rollup } = require('rollup');
 const { default: resolve } = require('@rollup/plugin-node-resolve');
 const { minify: minifyCSS } = require('csso');
