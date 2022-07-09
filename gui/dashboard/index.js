@@ -1,5 +1,7 @@
 import App from './app.svelte';
 
-export default new App({
-  target: document.body,
+document.addEventListener('DOMContentLoaded', () => {
+  new App({
+    target: document.getElementsByTagName('body')[0],
+  });
 });

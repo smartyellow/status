@@ -1,6 +1,5 @@
 'use strict';
 
-require('svelte/register');
 const { fork } = require('child_process');
 const { processOutage } = require('./lib/processoutage');
 const buildDashboard = require('./builddashboard');
@@ -538,7 +537,6 @@ module.exports = {
         if (!renderedDashboard) {
           renderedDashboard = await buildDashboard();
         }
-        console.log(renderedDashboard);
         const dashboardHtml = `
           <!DOCTYPE html>
           <html lang="en">
