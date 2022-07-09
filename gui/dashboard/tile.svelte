@@ -16,7 +16,7 @@
 <style>
   .tile {
     padding: 1rem;
-    background-color: var(--dark);
+    background-color: var(--tile-bg);
     border-radius: var(--radius);
   }
 

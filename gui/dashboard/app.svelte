@@ -13,7 +13,7 @@
 <style>
   :global(html, body) {
     --radius: 10px;
-    --dark: #181818;
+    --tile-bg: #181818;
 
     background-color: #000;
     color: #fff;
