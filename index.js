@@ -2,8 +2,8 @@
 
 const { fork } = require('child_process');
 const { processOutage } = require('./lib/processoutage');
-const buildDashboard = require('./dashboard/build');
-const createDashboardSocket = require('./dashboard/socket');
+const buildDashboard = require('./lib/dashboard/build');
+const createDashboardSocket = require('./lib/dashboard/socket');
 const { minifyHtml } = require('core/strings');
 const { readFile } = require('fs/promises');
 

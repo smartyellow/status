@@ -52,11 +52,19 @@
   .header {
     display: flex;
     align-items: center;
+    border-bottom: 1px solid var(--dark);
   }
 
   .header button.close {
     margin-left: auto;
     overflow-y: auto;
+    font-size: 1.5rem;
+    border-radius: var(--radius);
+    border-radius: 0 var(--radius) 0 0;
+  }
+
+  .header button.close:hover {
+    background-color: var(--dark);
   }
 
   .header .title {

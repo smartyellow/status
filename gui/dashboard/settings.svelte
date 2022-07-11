@@ -1,10 +1,38 @@
 <script>
   import Modal from './modal.svelte';
+  import { settings } from './index';
+  import { onMount } from 'svelte';
+  import { get } from 'svelte/store';
 
   let open = false;
+  let showCopyCheck = false;
+  let options = {};
+
+  let theme = 'dark';
+
+  onMount(() => {
+    ({ theme } = get(settings));
+  });
+
+  function fillOptions() {
+    options = { theme };
+  }
 
   function toggle() {
     open = !open;
+  }
+
+  function copy() {
+    if (typeof navigator.clipboard?.writeText === 'function') {
+      navigator.clipboard.writeText(JSON.stringify(options));
+      showCopyCheck = true;
+      setTimeout(() => showCopyCheck = false, 2000);
+    }
+  }
+
+  function change() {
+    fillOptions();
+    settings.set(options);
   }
 </script>
 
@@ -17,7 +45,24 @@
 {/if}
 
 <Modal title="Settings" bind:open>
-  hi
+  <div class="mb">
+    <button on:click={copy} class="btn copy">
+      Copy settings to clipboard
+      {#if showCopyCheck}
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 405.27 405.27">
+          <path d="M393.4 124.42 179.6 338.21a40.57 40.57 0 0 1-57.36 0L11.88 227.84a40.56 40.56 0 0 1 57.35-57.37l81.7 81.7 185.1-185.1a40.57 40.57 0 0 1 57.37 57.36z"/>
+        </svg>
+      {/if}
+    </button>
+  </div>
+
+  <label for="theme">
+    Color theme
+    <select id="theme" bind:value={theme} on:change={change}>
+      <option value="dark">Dark</option>
+      <option value="light">Light</option>
+    </select>
+  </label>
 </Modal>
 
 <style>
@@ -28,15 +73,25 @@
     opacity: 0.4;
     color: #fff;
   }
+
   button.settings svg {
     width: 20px;
     height: 20px;
     transition: linear 0.4s;
   }
+
   button.settings:hover {
     opacity: 0.9;
   }
+
   button.settings:hover svg {
     transform: rotate(90deg);
+  }
+
+  button.copy svg {
+    fill: var(--green);
+    height: 1rem;
+    width: 1rem;
+    margin-left: 1rem;
   }
 </style>
