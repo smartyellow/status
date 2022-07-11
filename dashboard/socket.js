@@ -10,10 +10,15 @@ async function createDashboardSocket(server) {
     route: '/statusdashboard/socket',
     onOpen: async ws => {
       function sendTime() {
-        ws.send(JSON.stringify({
-          cmd: 'time',
-          time: new Date().getTime(),
-        }));
+        try {
+          ws.send(JSON.stringify({
+            cmd: 'time',
+            time: new Date().getTime(),
+          }));
+        }
+        catch {
+          return;
+        }
       }
 
       sendTime();
@@ -36,13 +41,19 @@ async function createDashboardSocket(server) {
           mappedServices[s.id] = {
             name: s.name,
             lastBeat: lastBeat || {},
+            cluster: s.cluster,
           };
         }
 
-        ws.send(JSON.stringify({
-          cmd: 'data',
-          data: mappedServices,
-        }));
+        try {
+          ws.send(JSON.stringify({
+            cmd: 'data',
+            data: mappedServices,
+          }));
+        }
+        catch {
+          return;
+        }
       }
 
       sendStatuses();
@@ -51,7 +62,6 @@ async function createDashboardSocket(server) {
     onUpgrade: async () => ({ id: makeId(10) }),
     onMessage: async (ws, msg) => {
       msg = JSON.parse(decoder.decode(msg));
-      console.log('msg', msg);
 
       if (!msg || !msg.command) {
         return;

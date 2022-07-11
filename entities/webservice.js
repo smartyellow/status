@@ -24,6 +24,7 @@ module.exports = {
             'name',
             'state',
             'public',
+            'cluster',
             'tags',
             'channels',
           ],
@@ -91,6 +92,18 @@ module.exports = {
           fields: [
             { key: 'public',
               editor: 'checkbox',
+            },
+          ],
+        },
+
+        cluster: {
+          label: 'cluster',
+          fields: [
+            { key: 'cluster',
+              editor: 'select',
+              placeholder: 'select a cluster for this service...',
+              visible: !!(settings.clusters && Object.keys(settings.clusters).length),
+              options: settings.clusters,
             },
           ],
         },

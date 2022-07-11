@@ -9,7 +9,7 @@ const { default: resolve } = require('@rollup/plugin-node-resolve');
 const svelte = require('rollup-plugin-svelte');
 const { terser } = require('rollup-plugin-terser');
 
-async function build(server) {
+async function build({ server, settings }) {
   const serverDomain = server.settings.domain || 'localhost';
   const serverPort = server.settings.port || 80;
   const serverBase = `${serverDomain}:${serverPort}`;
@@ -49,6 +49,7 @@ async function build(server) {
           preventAssignment: false,
           values: {
             '__SERVER__': serverBase,
+            '__CLUSTERS__': JSON.stringify(settings.clusters),
           },
         }),
       ],
@@ -62,6 +63,7 @@ async function build(server) {
     });
 
     return {
+      map: output[0].map.toUrl(),
       code: output[0].code,
       css: cssOutput.css,
     };

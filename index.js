@@ -85,17 +85,11 @@ module.exports = {
   },
 
   settings: {
-    emailSender: {
-      type: 'string',
-      label: 'notification sender',
-      description: 'Sender of notifications about service statuses. Format: Name <email@example.com>',
-      default: '',
-    },
-    emailRecipient: {
-      type: 'array',
-      label: 'notification recipients',
-      description: 'Recipients of notifications about service statuses. Format: Name <email@example.com>',
-      default: [],
+    clusters: {
+      type: 'keys',
+      label: 'clusters',
+      description: 'Clusters can be used to catogorise web services into groups.',
+      default: {},
     },
     serviceTags: {
       type: 'keys',
@@ -109,10 +103,22 @@ module.exports = {
       description: 'Tags that can be assigned to outage messages to categorise them.',
       default: {},
     },
+    emailSender: {
+      type: 'string',
+      label: 'notification sender',
+      description: 'Sender of notifications about service statuses. Format: Name <email@example.com>',
+      default: '',
+    },
+    emailRecipient: {
+      type: 'array',
+      label: 'notification recipients',
+      description: 'Recipients of notifications about service statuses. Format: Name <email@example.com>',
+      default: [],
+    },
     draftOutageEntries: {
       type: 'boolean',
       label: 'draft outage entries',
-      description: 'Automatically draft outage entry when a service is down.',
+      description: 'Automatically draft an outage entry when a service is down?',
       default: true,
     },
   },
@@ -200,10 +206,8 @@ module.exports = {
     { id: 'startDashboardSocket',
       event: 'boot',
       order: 100,
-      purpose: 'Start the websocket for the dashboard after server has booted',
-      handler: async ({ server }) => {
-        createDashboardSocket(server);
-      },
+      purpose: 'Start the websocket for the dashboard after boot',
+      handler: () => createDashboardSocket(server),
     },
 
     { id: 'autotestOnSave',
@@ -232,7 +236,7 @@ module.exports = {
     },
   ],
 
-  routes: ({ server }) => [
+  routes: ({ server, settings }) => [
 
     // Get all services
     { route: '/webservices',
@@ -533,7 +537,7 @@ module.exports = {
       handler: async (req, res) => {
         try {
           if (!renderedDashboard) {
-            renderedDashboard = await buildDashboard(server);
+            renderedDashboard = await buildDashboard({ server, settings });
             renderedDashboard.globalCss = await readFile(
               __dirname + '/gui/dashboard/app.css'
             );
@@ -550,7 +554,10 @@ module.exports = {
                 <style>${renderedDashboard.css || ''}</style>
               </head>
               <body>
-                <script>${renderedDashboard.code || ''}</script>
+                <script>
+                  ${renderedDashboard.code || ''}
+                  //# sourceMappingURL=${renderedDashboard.map || ''}
+                </script>
               </body>
             </html>
           `);
