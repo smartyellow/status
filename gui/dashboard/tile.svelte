@@ -49,6 +49,7 @@
 
   .tile.grey {
     opacity: 0.5;
+    border-color: var(--grey);
   }
 
   .tile.grey .content {
