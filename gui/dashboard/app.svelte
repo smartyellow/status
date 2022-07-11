@@ -10,11 +10,6 @@
   let servicesUp = {};
   let servicesDown = {};
   let servicesUnknown = {};
-  let servicesInCluster = {};
-  let servicesInClusterUnknown = {};
-  const clusters = JSON.parse('__CLUSTERS__');
-  const clusterKeys = clusters ? Object.keys(clusters) : false;
-  let currentClusterIndex = -1;
   let loading = true;
   let lock = false;
 
@@ -68,39 +63,6 @@
       }
     }
   });
-
-  $: if (clusterKeys?.length && !loading) {
-      function nextCluster() {
-        lock = true;
-        currentClusterIndex++;
-
-        if (currentClusterIndex >= clusterKeys.length) {
-          currentClusterIndex = 0;
-        }
-
-        const inClusterTemp = {};
-        const inClusterTempUnknown = {};
-        const currentClusterKey = clusterKeys[currentClusterIndex];
-
-        for (const [ id, s ] of Object.entries(services)) {
-          if (s.cluster === currentClusterKey) {
-            if (!s.lastBeat || !s.lastBeat.date) {
-              inClusterTempUnknown[id] = s;
-            }
-            else {
-              inClusterTemp[id] = s;
-            }
-          }
-        }
-
-        servicesInCluster = inClusterTemp;
-        servicesInClusterUnknown = inClusterTempUnknown;
-        lock = false;
-      }
-
-      nextCluster();
-      setInterval(() => nextCluster, 10_000);
-    }
 </script>
 
 <Settings />
@@ -112,14 +74,8 @@
 
       {#if !loading}
         <Tiles services={servicesDown} color="red" value="down" />
-
-        {#if !clusterKeys?.length}
-          <Tiles services={servicesUp} color="green" value="up" />
-          <Tiles services={servicesUnknown} color="grey" value="no data" />
-        {:else}
-          <Tiles services={servicesInCluster} color="green" value="up" />
-          <Tiles services={servicesInClusterUnknown} color="grey" value="no data" />
-        {/if}
+        <Tiles services={servicesUp} color="green" value="up" />
+        <Tiles services={servicesUnknown} color="grey" value="no data" />
       {:else}
         loading
       {/if}
