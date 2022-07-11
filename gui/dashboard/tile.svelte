@@ -47,6 +47,10 @@
     border-color: var(--green);
   }
 
+  .tile.grey {
+    opacity: 0.5;
+  }
+
   .tile.grey .content {
     color: var(--grey);
   }
