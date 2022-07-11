@@ -35,7 +35,7 @@ async function createDashboardSocket(server) {
           const lastBeat = heartbeats.find(h => h.webservice === s.id);
           mappedServices[s.id] = {
             name: s.name,
-            lastBeat: lastBeat,
+            lastBeat: lastBeat || {},
           };
         }
 

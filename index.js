@@ -5,6 +5,7 @@ const { processOutage } = require('./lib/processoutage');
 const buildDashboard = require('./dashboard/build');
 const createDashboardSocket = require('./dashboard/socket');
 const { minifyHtml } = require('core/strings');
+const { readFile } = require('fs/promises');
 
 const guiCluster = 'web service status';
 const icons = {
@@ -533,6 +534,9 @@ module.exports = {
         try {
           if (!renderedDashboard) {
             renderedDashboard = await buildDashboard(server);
+            renderedDashboard.globalCss = await readFile(
+              __dirname + '/gui/dashboard/app.css'
+            );
           }
           const dashboardHtml = minifyHtml(`
             <!DOCTYPE html>
@@ -542,6 +546,7 @@ module.exports = {
                 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                 <title>Web service status dashboard</title>
+                <style>${renderedDashboard.globalCss || ''}</style>
                 <style>${renderedDashboard.css || ''}</style>
               </head>
               <body>

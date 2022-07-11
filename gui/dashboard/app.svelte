@@ -1,5 +1,4 @@
 <script>
-  import './app.css';
   import { onMount } from 'svelte';
   import TileRawValue from './tile-rawvalue.svelte';
   import Tiles from './tiles.svelte';
@@ -10,6 +9,7 @@
   let services = {};
   let servicesUp = {};
   let servicesDown = {};
+  let servicesUnknown = {};
   let loading = true;
 
   onMount(() => {
@@ -32,7 +32,13 @@
 
           for (const id of ids) {
             const service = services[id];
-            if (service.lastBeat && service.lastBeat.down) {
+            if (!service.lastBeat || !service.lastBeat.date) {
+              servicesUnknown = {
+                ...servicesUnknown,
+                [id]: service,
+              };
+            }
+            else if (service.lastBeat.down) {
               servicesDown = {
                 ...servicesDown,
                 [id]: service,
@@ -64,8 +70,9 @@
       <TileRawValue title="Last updated" value={lastUpdatedFormatted} />
 
       {#if !loading}
-        <Tiles services={servicesDown} />
-        <Tiles services={servicesUp} />
+        <Tiles services={servicesDown} color="red" value="down" />
+        <Tiles services={servicesUp} color="green" value="up" />
+        <Tiles services={servicesUnknown} color="grey" value="no data" />
       {:else}
         loading
       {/if}

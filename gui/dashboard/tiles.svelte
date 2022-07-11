@@ -2,13 +2,15 @@
   import TileRawValue from './tile-rawvalue.svelte';
 
   export let services;
+  export let color;
+  export let value;
 </script>
 
 {#each Object.entries(services) as [ id, service ] (id)}
-  {@const isDown = service.lastBeat.down}
   <TileRawValue
     title={service.name.en}
-    value={isDown ? 'down' : 'up'}
-    color={isDown ? 'red' : 'green'}
+    date={service.lastBeat.date ? new Date(service.lastBeat.date) : false}
+    {value}
+    {color}
   />
 {/each}

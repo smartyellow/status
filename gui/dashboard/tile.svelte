@@ -2,22 +2,31 @@
   export let title;
   export let subtitle;
   export let color;
+  export let date;
 </script>
 
 <div class="tile {color}">
-  {#if title || subtitle}
+  {#if title || subtitle || date}
     <div class="desc">
-      {#if title}
-        <div class="title">{title}</div>
-      {/if}
+      <div>
+        {#if title}
+          <div class="title">{title}</div>
+        {/if}
 
-      {#if subtitle}
-        <div class="subtitle">{subtitle}</div>
+        {#if subtitle}
+          <div class="subtitle">{subtitle}</div>
+        {/if}
+      </div>
+
+      {#if date}
+        <div class="time">{date.toLocaleTimeString('en-GB', {
+          timeStyle: 'short',
+        })}</div>
       {/if}
     </div>
   {/if}
 
-  <slot />
+  <div class="content"><slot /></div>
 </div>
 
 <style>
@@ -38,9 +47,14 @@
     border-color: var(--green);
   }
 
+  .tile.grey .content {
+    color: var(--grey);
+  }
+
   .desc {
     font-size: 1.3rem;
     margin-bottom: 1rem;
+    display: flex;
   }
 
   .desc .title {
@@ -49,5 +63,10 @@
 
   .desc .subtitle {
     font-weight: 100;
+  }
+
+  .desc .time {
+    opacity: 0.6;
+    margin-left: auto;
   }
 </style>

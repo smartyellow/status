@@ -1,6 +1,7 @@
 html, body {
   --body-bg: #000;
   --tile-bg: #181818;
+  --grey: grey;
   --red: red;
   --green: green;
   --radius: 10px;

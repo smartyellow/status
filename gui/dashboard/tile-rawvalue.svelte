@@ -5,9 +5,10 @@
   export let subtitle;
   export let color;
   export let value;
+  export let date;
 </script>
 
-<Tile {title} {subtitle} {color}>
+<Tile {title} {subtitle} {color} {date}>
   <div class="value {color}">
     {value}
   </div>
