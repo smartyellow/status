@@ -38,6 +38,7 @@ module.exports = {
         { label: 'auto testing',
           sections: [
             'autotestEnabled',
+            'autotestInterval',
             'lastChecked',
             'autotest',
           ],
@@ -213,6 +214,18 @@ module.exports = {
           fields: [
             { key: 'autotest',
               editor: 'smartyellow/autotest',
+            },
+          ],
+        },
+
+        autotestInterval: {
+          label: 'test interval',
+          hint: 'Interval between 2 automatic tests in minutes.',
+          fields: [
+            { key: 'autotestInterval',
+              editor: 'number',
+              label: 'minutes',
+              labelPosition: 'right',
             },
           ],
         },

@@ -84,12 +84,6 @@ module.exports = {
   },
 
   settings: {
-    autotestInterval: {
-      type: 'number',
-      label: 'autotest interval',
-      description: 'Autotest interval in minutes.',
-      default: 10,
-    },
     emailSender: {
       type: 'string',
       label: 'notification sender',
@@ -120,15 +114,6 @@ module.exports = {
       description: 'Automatically draft outage entry when a service is down.',
       default: true,
     },
-  },
-
-  init: async ({ server, settings }) => {
-    settings.autotestInterval = Number(settings.autotestInterval);
-    if (Number.isNaN(settings.autotestInterval)) {
-      server.warn('status: settings.autotestInterval is not a number. Using default value 10.');
-      settings.autotestInterval = 10;
-    }
-    return true;
   },
 
   gui: {
@@ -183,7 +168,7 @@ module.exports = {
       mandatory: false,
       runAtBoot: true,
       active: true,
-      interval: Number(settings.autotestInterval) * 60 * 1000,
+      interval: 60 * 1000,
       action: async () => {
         const services = await server
           .storage
