@@ -1,9 +1,10 @@
 <script>
   export let title;
   export let subtitle;
+  export let color;
 </script>
 
-<div class="tile">
+<div class="tile {color}">
   {#if title || subtitle}
     <div class="desc">
       {#if title}
@@ -20,22 +21,33 @@
 </div>
 
 <style>
+  .tile {
+    padding: 1rem;
+    background-color: var(--tile-bg);
+    border-radius: var(--radius);
+    border: 2px solid var(--tile-bg);
+  }
+
+  .tile.red {
+    background-color: var(--red);
+    border-color: var(--red);
+    color: #fff;
+  }
+
+  .tile.green {
+    border-color: var(--green);
+  }
+
   .desc {
     font-size: 1.3rem;
     margin-bottom: 1rem;
   }
 
-  .tile {
-    padding: 1rem;
-    background-color: var(--tile-bg);
-    border-radius: var(--radius);
-  }
-
-  .title {
+  .desc .title {
     font-weight: 200;
   }
 
-  .subtitle {
+  .desc .subtitle {
     font-weight: 100;
   }
 </style>

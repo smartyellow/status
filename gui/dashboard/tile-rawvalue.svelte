@@ -7,7 +7,7 @@
   export let value;
 </script>
 
-<Tile {title} {subtitle}>
+<Tile {title} {subtitle} {color}>
   <div class="value {color}">
     {value}
   </div>
@@ -17,13 +17,5 @@
   .value {
     font-size: 3rem;
     font-weight: 600;
-  }
-
-  .red {
-    color: var(--red);
-  }
-
-  .green {
-    color: var(--green);
   }
 </style>

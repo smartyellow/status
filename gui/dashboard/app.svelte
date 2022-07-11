@@ -1,10 +1,13 @@
 <script>
   import { onMount } from 'svelte';
   import TileRawValue from './tile-rawvalue.svelte';
+  import Tiles from './tiles.svelte';
 
   let lastUpdated = new Date();
   let lastUpdatedFormatted = '';
   let services = {};
+  let servicesUp = {};
+  let servicesDown = {};
   let loading = true;
 
   $:console.log(services);
@@ -25,6 +28,24 @@
 
         case 'data':
           services = data.data;
+          const ids = Object.keys(services);
+
+          for (const id of ids) {
+            const service = services[id];
+            if (service.lastBeat && service.lastBeat.down) {
+              servicesDown = {
+                ...servicesDown,
+                [id]: service,
+              };
+            }
+            else {
+              servicesUp = {
+                ...servicesUp,
+                [id]: service,
+              };
+            }
+          }
+
           loading = false;
           break;
 
@@ -41,14 +62,8 @@
       <TileRawValue title="Last updated" value={lastUpdatedFormatted} />
 
       {#if !loading}
-        {#each Object.entries(services) as [ id, service ] (id)}
-          {@const isDown = service.lastBeat.down}
-          <TileRawValue
-            title={service.name.en}
-            value={isDown ? 'down' : 'up'}
-            color={isDown ? 'red' : 'green'}
-          />
-        {/each}
+        <Tiles services={servicesDown} />
+        <Tiles services={servicesUp} />
       {:else}
         loading
       {/if}
