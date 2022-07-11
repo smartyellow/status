@@ -45,6 +45,7 @@
 
   .tile.green {
     border-color: var(--green);
+    background-color: var(--green);
   }
 
   .tile.grey {
