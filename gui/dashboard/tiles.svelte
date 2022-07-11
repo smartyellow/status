@@ -9,6 +9,7 @@
 {#each Object.entries(services) as [ id, service ] (id)}
   <TileRawValue
     title={service.name.en}
+    subtitle={service.cluster}
     date={service.lastBeat.date ? new Date(service.lastBeat.date) : false}
     {value}
     {color}
