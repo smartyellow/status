@@ -1,17 +1,39 @@
 <script>
   import { onMount } from 'svelte';
   import TileRawValue from './tile-rawvalue.svelte';
-  import Tiles from './tiles.svelte';
   import Settings from './settings.svelte';
 
+  const size = 3 * 4;
   let lastUpdated = new Date();
   let lastUpdatedFormatted = '';
-  let services = {};
-  let servicesUp = {};
-  let servicesDown = {};
-  let servicesUnknown = {};
-  let loading = true;
-  let lock = false;
+  let services = [];
+  let pageNum = -1;
+
+  function tileProps(service) {
+    let props = {
+      title: service.name.en,
+      subtitle: service.cluster,
+      date: service.lastBeat?.date ? new Date(service.lastBeat.date) : undefined,
+    };
+
+    if (!service.lastBeat?.date) {
+      props.value = 'no data';
+      props.color = 'grey';
+      props.sort = 20;
+    }
+    if (service.lastBeat.down) {
+      props.value = 'down';
+      props.color = 'red';
+      props.sort = 0;
+    }
+    else {
+      props.value = 'up';
+      props.color = 'green';
+      props.sort = 10;
+    }
+
+    return props;
+  }
 
   onMount(() => {
     const ws = new WebSocket('ws://__SERVER__/statusdashboard/socket');
@@ -28,34 +50,24 @@
           break;
 
         case 'data':
-          while (lock) {}
+          const tempServices = [];
+          const d = data.data;
+          const ids = Object.keys(d);
+          ids.sort((a, b) => tileProps(d[a]).sort - tileProps(d[b]).sort);
 
-          services = data.data;
-          const ids = Object.keys(services);
-
-          for (const id of ids) {
-            const service = services[id];
-            if (!service.lastBeat || !service.lastBeat.date) {
-              servicesUnknown = {
-                ...servicesUnknown,
-                [id]: service,
-              };
-            }
-            else if (service.lastBeat.down) {
-              servicesDown = {
-                ...servicesDown,
-                [id]: service,
-              };
-            }
-            else {
-              servicesUp = {
-                ...servicesUp,
-                [id]: service,
-              };
-            }
+          if ((ids.length > size) || (pageNum === -1)) {
+            pageNum++;
           }
 
-          loading = false;
+          if (pageNum * size >= ids.length) {
+            pageNum = 0;
+          }
+
+          for (let i = pageNum * size; (i < ids.length) && (i < size + size * pageNum); i++) {
+            tempServices.push(d[ids[i]]);
+          }
+
+          services = tempServices;
           break;
 
         default:
@@ -72,13 +84,9 @@
     <div class="tiles">
       <TileRawValue title="Last updated" value={lastUpdatedFormatted} />
 
-      {#if !loading}
-        <Tiles services={servicesDown} color="red" value="down" />
-        <Tiles services={servicesUp} color="green" value="up" />
-        <Tiles services={servicesUnknown} color="grey" value="no data" />
-      {:else}
-        loading
-      {/if}
+      {#each services as service}
+        <TileRawValue {...tileProps(service)} />
+      {/each}
     </div>
   </div>
 </div>
