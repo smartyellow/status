@@ -4,16 +4,20 @@ const { minify: minifyCSS } = require('csso');
 const { rollup } = require('rollup');
 const commonjs = require('@rollup/plugin-commonjs');
 const css = require('rollup-plugin-css-only');
+const replace = require('@rollup/plugin-replace');
 const { default: resolve } = require('@rollup/plugin-node-resolve');
 const svelte = require('rollup-plugin-svelte');
 const { terser } = require('rollup-plugin-terser');
 
-async function build() {
+async function build(server) {
+  const serverDomain = server.settings.domain || 'localhost';
+  const serverPort = server.settings.port || 80;
+  const serverBase = `${serverDomain}:${serverPort}`;
   let cssOutput = '';
 
   try {
     const bundle = await rollup({
-      input: __dirname + '/gui/dashboard/index.js',
+      input: __dirname + '/../gui/dashboard/index.js',
       plugins: [
         // Svelte
         svelte({
@@ -39,6 +43,14 @@ async function build() {
 
         // Minify
         terser(),
+
+        // Replace env vars
+        replace({
+          preventAssignment: false,
+          values: {
+            '__SERVER__': serverBase,
+          },
+        }),
       ],
     });
 

@@ -1,19 +1,69 @@
 <script>
   import { onMount } from 'svelte';
+  import TileRawValue from './tile-rawvalue.svelte';
 
-  onMount(() => console.log('test'));
+  let lastUpdated = new Date();
+  let lastUpdatedFormatted = '';
+  let services = {};
+  let loading = true;
+
+  $:console.log(services);
+
+  onMount(() => {
+    const ws = new WebSocket('ws://__SERVER__/statusdashboard/socket');
+
+    ws.onmessage = async evt => {
+      const data = JSON.parse(evt.data || '""');
+
+      switch (data.cmd) {
+        case 'time':
+          lastUpdated = new Date(data.time);
+          lastUpdatedFormatted = lastUpdated.toLocaleTimeString('en-GB', {
+            timeStyle: 'short',
+          });
+          break;
+
+        case 'data':
+          services = data.data;
+          loading = false;
+          break;
+
+        default:
+          break;
+      }
+    }
+  });
 </script>
 
 <div class="center">
   <div class="ratio">
+    <div class="tiles">
+      <TileRawValue title="Last updated" value={lastUpdatedFormatted} />
 
+      {#if !loading}
+        {#each Object.entries(services) as [ id, service ] (id)}
+          {@const isDown = service.lastBeat.down}
+          <TileRawValue
+            title={service.name.en}
+            value={isDown ? 'down' : 'up'}
+            color={isDown ? 'red' : 'green'}
+          />
+        {/each}
+      {:else}
+        loading
+      {/if}
+    </div>
   </div>
 </div>
 
 <style>
   :global(html), :global(body) {
-    --radius: 10px;
     --tile-bg: #181818;
+    --red: red;
+    --green: green;
+    --radius: 10px;
+    --cols: 4;
+    --rows: 3;
 
     background-color: #000;
     color: #fff;
@@ -39,5 +89,14 @@
     top: 50%;
     transform: translate(-50%,-50%);
     width: 100vw;
+  }
+
+  .tiles {
+    margin: 1rem;
+    display: grid;
+    grid-template-columns: repeat(var(--cols), 1fr);
+    grid-template-rows: repeat(var(--rows), 1fr);
+    gap: 1rem;
+    justify-items: stretch;
   }
 </style>

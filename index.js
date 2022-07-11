@@ -2,7 +2,8 @@
 
 const { fork } = require('child_process');
 const { processOutage } = require('./lib/processoutage');
-const buildDashboard = require('./builddashboard');
+const buildDashboard = require('./dashboard/build');
+const createDashboardSocket = require('./dashboard/socket');
 const { minifyHtml } = require('core/strings');
 
 const guiCluster = 'web service status';
@@ -210,6 +211,15 @@ module.exports = {
   ],
 
   hooks: ({ server, settings }) => [
+    { id: 'startDashboardSocket',
+      event: 'boot',
+      order: 100,
+      purpose: 'Start the websocket for the dashboard after server has booted',
+      handler: async ({ server }) => {
+        createDashboardSocket(server);
+      },
+    },
+
     { id: 'autotestOnSave',
       order: 500,
       event: 'saveEntity',
@@ -535,24 +545,29 @@ module.exports = {
     { route: '/statusdashboard',
       method: 'get',
       handler: async (req, res) => {
-        if (!renderedDashboard) {
-          renderedDashboard = await buildDashboard();
+        try {
+          if (!renderedDashboard) {
+            renderedDashboard = await buildDashboard(server);
+          }
+          const dashboardHtml = minifyHtml(`
+            <!DOCTYPE html>
+            <html lang="en">
+              <head>
+                <meta charset="UTF-8" />
+                <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <title>Web service status dashboard</title>
+                <style>${renderedDashboard.css || ''}</style>
+                <script>${renderedDashboard.code || ''}</script>
+              </head>
+              <body></body>
+            </html>
+          `);
+          res.send(dashboardHtml);
         }
-        const dashboardHtml = minifyHtml(`
-          <!DOCTYPE html>
-          <html lang="en">
-            <head>
-              <meta charset="UTF-8" />
-              <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-              <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-              <title>Web service status dashboard</title>
-              <style>${renderedDashboard.css || ''}</style>
-              <script>${renderedDashboard.code || ''}</script>
-            </head>
-            <body></body>
-          </html>
-        `);
-        res.send(dashboardHtml);
+        catch (error) {
+          server.error('could not compile web service status dashboard', error);
+        }
       },
     },
 
