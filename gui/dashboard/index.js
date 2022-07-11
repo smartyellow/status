@@ -1,7 +1,8 @@
 import App from './app.svelte';
+import { writable } from 'svelte-local-storage-store';
 
-document.addEventListener('DOMContentLoaded', () => {
-  new App({
-    target: document.getElementsByTagName('body')[0],
-  });
+new App({ target: document.body });
+
+export const settings = writable('settings', {
+  theme: 'dark',
 });

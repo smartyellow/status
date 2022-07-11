@@ -1,7 +1,9 @@
 <script>
+  import './app.css';
   import { onMount } from 'svelte';
   import TileRawValue from './tile-rawvalue.svelte';
   import Tiles from './tiles.svelte';
+  import Settings from './settings.svelte';
 
   let lastUpdated = new Date();
   let lastUpdatedFormatted = '';
@@ -9,8 +11,6 @@
   let servicesUp = {};
   let servicesDown = {};
   let loading = true;
-
-  $:console.log(services);
 
   onMount(() => {
     const ws = new WebSocket('ws://__SERVER__/statusdashboard/socket');
@@ -56,6 +56,8 @@
   });
 </script>
 
+<Settings />
+
 <div class="center">
   <div class="ratio">
     <div class="tiles">
@@ -72,21 +74,6 @@
 </div>
 
 <style>
-  :global(html), :global(body) {
-    --tile-bg: #181818;
-    --red: red;
-    --green: green;
-    --radius: 10px;
-    --cols: 4;
-    --rows: 3;
-
-    background-color: #000;
-    color: #fff;
-    padding: 0;
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-  }
-
   .center {
     display: flex;
     align-items: center;
