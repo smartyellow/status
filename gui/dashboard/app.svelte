@@ -3,7 +3,7 @@
   import TileRawValue from './tile-rawvalue.svelte';
   import Settings from './settings.svelte';
   import { flip } from 'svelte/animate';
-  import { shuffle } from './lib';
+  import { shuffle, ringBell } from './lib';
 
   const [ send, receive ] = shuffle;
   const size = 3 * 4 - 1;
@@ -43,29 +43,38 @@
     ws.onmessage = async evt => {
       const data = JSON.parse(evt.data || '""');
 
-      if (data.cmd === 'data') {
-        let servicesTemp = [];
-        const { servicesUp, servicesDown, servicesUnknown, total } = data;
-        const upOrUnknown = [ ...servicesUp, ...servicesUnknown ];
-        servicesTemp = servicesDown.slice(0, size);
+      switch (data.cmd) {
+        case 'data':
+          let servicesTemp = [];
+          const { servicesUp, servicesDown, servicesUnknown, total } = data;
+          const upOrUnknown = [ ...servicesUp, ...servicesUnknown ];
+          servicesTemp = servicesDown.slice(0, size);
 
-        if (pageNum === -1 || total >= size) {
-          pageNum++;
+          if (pageNum === -1 || total >= size) {
+            pageNum++;
 
-          if (pageNum > Math.ceil(upOrUnknown.length / size)) {
-            pageNum = 0;
+            if (pageNum > Math.ceil(upOrUnknown.length / size)) {
+              pageNum = 0;
+            }
           }
-        }
 
-        const placesLeft = size - servicesTemp.length;
-        const offset = placesLeft * pageNum;
-        if (placesLeft > 0) {
-          servicesTemp.push(
-            ...upOrUnknown.slice(offset, placesLeft + offset)
-          );
-        }
+          const placesLeft = size - servicesTemp.length;
+          const offset = placesLeft * pageNum;
+          if (placesLeft > 0) {
+            servicesTemp.push(
+              ...upOrUnknown.slice(offset, placesLeft + offset)
+            );
+          }
 
-        tiles = servicesTemp;
+          tiles = servicesTemp;
+          break;
+
+        case 'bell':
+          ringBell();
+          break;
+
+        default:
+          break;
       }
     }
 

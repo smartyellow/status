@@ -569,6 +569,14 @@ module.exports = {
       },
     },
 
+    { route: '/statusdashboard/sound',
+      method: 'get',
+      handler: (req, res) => {
+        res.headers['content-type'] = 'audio/x-wav';
+        res.sendFile(__dirname + '/gui/sounds/bell.wav');
+      },
+    },
+
   ],
 
 };
