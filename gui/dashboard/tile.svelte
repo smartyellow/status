@@ -29,30 +29,29 @@
   });
 </script>
 
-<div class="tile {color}">
-  {#if title || subtitle || date}
+<div class="tile {color}" class:center>
+  {#if title || subtitle}
     <div class="desc">
-      <div>
-        {#if title}
-          <div class="title">{title}</div>
-        {/if}
+      {#if title}
+        <div class="title">{title}</div>
+      {/if}
 
-        {#if subtitle}
-          <div class="subtitle">{subtitle}</div>
-        {/if}
-      </div>
-
-      {#if date || since}
-        <div class="time">
-          {formattedDate}
-          {#if date && since}<br />{/if}
-          {formattedDuration}
-        </div>
+      {#if subtitle}
+        <div class="subtitle">{subtitle}</div>
       {/if}
     </div>
   {/if}
 
-  <div class="content" class:center><slot /></div>
+  <div class="bottom" class:center>
+    <div class="content"><slot /></div>
+    {#if date || since}
+      <div class="time">
+        {formattedDate}
+        {#if date && since}<br />{/if}
+        {formattedDuration}
+      </div>
+    {/if}
+  </div>
 </div>
 
 <style>
@@ -82,13 +81,17 @@
     border-color: var(--grey);
   }
 
-  .tile.grey .content {
+  .tile.grey .bottom {
     color: var(--grey);
+  }
+
+  .tile.center {
+    align-items: center;
+    justify-content: center;
   }
 
   .desc {
     margin-bottom: 1rem;
-    display: flex;
   }
 
   .desc .title {
@@ -101,19 +104,29 @@
     font-size: 1.5vw;
   }
 
-  .desc .time {
+  .bottom {
+    display: flex;
+    margin-top: auto;
+  }
+
+  .bottom .time {
+    margin-left: auto;
     opacity: 0.6;
     margin-left: auto;
     font-size: 1.3vw;
     text-align: right;
   }
 
-  .content {
+  .bottom .content {
     flex-grow: 1;
     display: flex;
   }
 
-  .content.center {
+  .bottom.center {
+    margin-top: 0;
+  }
+
+  .bottom.center .content {
     justify-content: center;
     align-items: center;
   }

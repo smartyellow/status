@@ -12,7 +12,7 @@
 </script>
 
 <Tile {title} {subtitle} {color} {date} {since} {center}>
-  <div class="value {color}" style:font-weight={weight} class:center>
+  <div class="value {color}" style:font-weight={weight}>
     {value}
   </div>
 </Tile>
@@ -22,9 +22,5 @@
     font-size: 3vw;
     font-weight: 600;
     margin-top: auto;
-  }
-
-  .value.center {
-    margin: auto 0;
   }
 </style>
