@@ -3,6 +3,7 @@
   export let subtitle;
   export let color;
   export let date;
+  export let center = false;
 </script>
 
 <div class="tile {color}">
@@ -26,7 +27,7 @@
     </div>
   {/if}
 
-  <div class="content"><slot /></div>
+  <div class="content" class:center><slot /></div>
 </div>
 
 <style>
@@ -60,25 +61,33 @@
   }
 
   .desc {
-    font-size: 1.3rem;
     margin-bottom: 1rem;
     display: flex;
   }
 
   .desc .title {
     font-weight: 300;
+    font-size: 1.7vw;
   }
 
   .desc .subtitle {
-    font-weight: 100;
+    font-weight: 200;
+    font-size: 1.5vw;
   }
 
   .desc .time {
     opacity: 0.6;
     margin-left: auto;
+    font-size: 1.3vw;
   }
 
   .content {
     flex-grow: 1;
+    display: flex;
+  }
+
+  .content.center {
+    justify-content: center;
+    align-items: center;
   }
 </style>

@@ -10,22 +10,20 @@
   export let weight = 600;
 </script>
 
-<Tile {title} {subtitle} {color} {date}>
-  <div class="value {color}" class:center style:font-weight={weight}>
+<Tile {title} {subtitle} {color} {date} {center}>
+  <div class="value {color}" style:font-weight={weight} class:center>
     {value}
   </div>
 </Tile>
 
 <style>
   .value {
-    font-size: 3rem;
+    font-size: 3vw;
     font-weight: 600;
+    margin-top: auto;
   }
 
   .value.center {
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    margin: auto 0;
   }
 </style>
