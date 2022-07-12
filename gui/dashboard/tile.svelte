@@ -1,9 +1,32 @@
 <script>
+  import { formatDuration } from './lib';
+  import { onMount } from 'svelte';
+
   export let title;
   export let subtitle;
   export let color;
   export let date;
+  export let since;
   export let center = false;
+
+  let formattedDuration = '';
+  $: formattedDate = date ? date.toLocaleTimeString('en-GB', {
+    timeStyle: 'short',
+  }) : '';
+
+  onMount(() => {
+    if (since) {
+      function updateDuration() {
+        formattedDuration = formatDuration(
+          new Date().getTime() - since.getTime()
+        );
+      }
+
+      updateDuration();
+      const interval = setInterval(updateDuration, 100);
+      return () => clearInterval(interval);
+    }
+  });
 </script>
 
 <div class="tile {color}">
@@ -19,10 +42,12 @@
         {/if}
       </div>
 
-      {#if date}
-        <div class="time">{date.toLocaleTimeString('en-GB', {
-          timeStyle: 'short',
-        })}</div>
+      {#if date || since}
+        <div class="time">
+          {formattedDate}
+          {#if date && since}<br />{/if}
+          {formattedDuration}
+        </div>
       {/if}
     </div>
   {/if}
@@ -79,6 +104,7 @@
     opacity: 0.6;
     margin-left: auto;
     font-size: 1.3vw;
+    text-align: right;
   }
 
   .content {

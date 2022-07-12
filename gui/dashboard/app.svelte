@@ -16,6 +16,7 @@
       title: service.name.en,
       subtitle: service.cluster,
       date: service.lastBeat?.date ? new Date(service.lastBeat.date) : undefined,
+      since: service.checked ? new Date(service.checked) : undefined,
     };
 
     if (!service.lastBeat?.date) {
