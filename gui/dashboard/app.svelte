@@ -3,10 +3,10 @@
   import TileRawValue from './tile-rawvalue.svelte';
   import Settings from './settings.svelte';
   import { flip } from 'svelte/animate';
-  import { shuffle, ringBell } from './lib';
+  import { settings, shuffle, ringBell } from './lib';
 
   const [ send, receive ] = shuffle;
-  const size = 3 * 4 - 1;
+  const size = ($settings.cols || 4) * ($settings.rows || 3) - 1;
   let pageNum = -1;
   let tiles = [];
   let time = '';
@@ -91,7 +91,10 @@
 
 <Settings />
 
-<div class="center">
+<div
+  class="center theme-{$settings.theme}"
+  style="--cols: {$settings.cols || 4}; --rows: {$settings.rows || 3};"
+>
   <div class="ratio">
     <div class="tiles">
       <TileRawValue value={time} center weight={200} />
@@ -116,6 +119,8 @@
     justify-content: center;
     width: 100vw;
     height: 100vh;
+    background-color: var(--body-bg);
+    color: var(--body-fg);
   }
 
   .ratio {

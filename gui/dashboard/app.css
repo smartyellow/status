@@ -1,5 +1,6 @@
 html, body {
   --body-bg: #000;
+  --body-fg: #fff;
   --tile-bg: #181818;
   --grey: grey;
   --red: red;
@@ -9,8 +10,6 @@ html, body {
   --cols: 4;
   --rows: 3;
 
-  background-color: var(--body-bg);
-  color: #fff;
   padding: 0;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
@@ -19,6 +18,7 @@ html, body {
 
 .theme-light {
   --body-bg: #fff;
+  --body-fg: #000;
   --tile-bg: #dedede;
   --dark: #c2c2c2;
 }
@@ -56,7 +56,6 @@ label {
 label input,
 label select {
   display: block;
-  width: 100%;
   margin-top: 0.5rem;
   font-size: 1rem;
   font-family: inherit;

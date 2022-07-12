@@ -1,4 +1,6 @@
 <script>
+  import { settings } from './lib';
+
   export let title = '';
   export let open = false;
 
@@ -7,7 +9,7 @@
   }
 </script>
 
-<div class="modal-bg" class:open>
+<div class="modal-bg theme-{$settings.theme}" class:open>
   <div class="modal">
     <div class="header">
       <div class="title">{title}</div>
@@ -47,6 +49,7 @@
     width: 100%;
     max-width: 500px;
     z-index: 11;
+    color: var(--body-fg);
   }
 
   .header {

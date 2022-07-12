@@ -3,12 +3,18 @@ import { quintOut } from 'svelte/easing';
 import { crossfade } from 'svelte/transition';
 
 function createSettingsStore() {
-  const s = writable(0);
+  const s = writable({
+    theme: 'dark',
+    cols: 4,
+    rows: 3,
+  });
 
   function updateStorage(val) {
     window.localStorage.setItem('statusdash', JSON.stringify(val));
     s.set(val);
   }
+
+  updateStorage(JSON.parse(window.localStorage.getItem('statusdash')));
 
   return {
     subscribe: s.subscribe,
