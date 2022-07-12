@@ -46,9 +46,8 @@
     <div class="content"><slot /></div>
     {#if date || since}
       <div class="time">
-        {formattedDate}
-        {#if date && since}<br />{/if}
-        {formattedDuration}
+        {#if formattedDate}<div>{formattedDate}</div>{/if}
+        {#if formattedDuration}<div>{formattedDuration}</div>{/if}
       </div>
     {/if}
   </div>
@@ -110,11 +109,13 @@
   }
 
   .bottom .time {
-    margin-left: auto;
+    margin: auto 0 0 auto;
     opacity: 0.6;
-    margin-left: auto;
     font-size: 1.3vw;
     text-align: right;
+    display: flex;
+    align-items: flex-end;
+    flex-direction: column;
   }
 
   .bottom .content {
