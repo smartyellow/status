@@ -3,7 +3,7 @@
   import TileRawValue from './tile-rawvalue.svelte';
   import Settings from './settings.svelte';
   import { flip } from 'svelte/animate';
-  import { proportionalGrid, settings, shuffle, ringBell } from './lib';
+  import { settings, shuffle, ringBell } from './lib';
 
   const [ send, receive ] = shuffle;
   let size = ($settings.cols || 4) * ($settings.rows || 3) - 1;
@@ -11,6 +11,28 @@
   let tiles = [];
   let time = '';
   let globalData = {};
+  let resizeTimer;
+
+  function onResize() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(proportionalGrid, 750);
+  }
+
+  function proportionalGrid() {
+    const container = document.querySelector('.center');
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    const tileW = 400;
+    const tileH = 300;
+    const availableCols = Math.floor(w / tileW);
+    const availableRows = Math.floor(h / tileH);
+    console.log(w, h, availableCols, availableRows);
+
+    settings.update({
+      cols: availableCols,
+      rows: availableRows,
+    });
+  }
 
   function tileProps(service) {
     let props = {
@@ -65,6 +87,7 @@
   }
 
   onMount(() => {
+    proportionalGrid();
     const ws = new WebSocket('ws://__SERVER__/statusdashboard/socket');
 
     ws.onmessage = async evt => {
@@ -100,7 +123,7 @@
   });
 </script>
 
-<svelte:window on:resize={proportionalGrid} />
+<svelte:window on:resize={onResize} />
 <Settings />
 
 <div
