@@ -1,6 +1,6 @@
 <script>
   import Modal from './modal.svelte';
-  import { settings } from './stores';
+  import { settings } from './lib';
   import { onMount } from 'svelte';
   import { get } from 'svelte/store';
 

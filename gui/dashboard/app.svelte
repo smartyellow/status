@@ -2,11 +2,16 @@
   import { onMount } from 'svelte';
   import TileRawValue from './tile-rawvalue.svelte';
   import Settings from './settings.svelte';
+  //import { flip } from 'svelte/animate';
+  //import { shuffle } from './lib';
 
+  //const [ send, receive ] = shuffle;
   const size = 3 * 4;
   let lastUpdated = new Date();
   let lastUpdatedFormatted = '';
-  let services = [];
+  let servicesUp = [];
+  let servicesDown = [];
+  let servicesUnknown = [];
   let pageNum = -1;
 
   function tileProps(service) {
@@ -21,7 +26,7 @@
       props.color = 'grey';
       props.sort = 20;
     }
-    if (service.lastBeat.down) {
+    else if (service.lastBeat.down) {
       props.value = 'down';
       props.color = 'red';
       props.sort = 0;
@@ -50,24 +55,7 @@
           break;
 
         case 'data':
-          const tempServices = [];
-          const d = data.data;
-          const ids = Object.keys(d);
-          ids.sort((a, b) => tileProps(d[a]).sort - tileProps(d[b]).sort);
-
-          if ((ids.length > size) || (pageNum === -1)) {
-            pageNum++;
-          }
-
-          if (pageNum * size >= ids.length) {
-            pageNum = 0;
-          }
-
-          for (let i = pageNum * size; (i < ids.length) && (i < size + size * pageNum); i++) {
-            tempServices.push(d[ids[i]]);
-          }
-
-          services = tempServices;
+          ({ servicesUp, servicesDown, servicesUnknown } = data);
           break;
 
         default:
@@ -84,9 +72,25 @@
     <div class="tiles">
       <TileRawValue title="Last updated" value={lastUpdatedFormatted} />
 
-      {#each services as service}
+      {#each servicesDown as service (service.id)}
         <TileRawValue {...tileProps(service)} />
       {/each}
+      {#each servicesUp as service (service.id)}
+        <TileRawValue {...tileProps(service)} />
+      {/each}
+      {#each servicesUnknown as service (service.id)}
+        <TileRawValue {...tileProps(service)} />
+      {/each}
+
+      <!--{#each services as service (service.id)}
+        <div
+          in:receive={{ key: service.id }}
+          out:send={{ key: service.id }}
+          animate:flip
+        >
+          <TileRawValue {...tileProps(service)} />
+        </div>
+      {/each}-->
     </div>
   </div>
 </div>
