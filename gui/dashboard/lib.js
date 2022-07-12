@@ -1,6 +1,6 @@
 import { get, writable } from 'svelte/store';
-//import { quintOut } from 'svelte/easing';
-//import { crossfade } from 'svelte/transition';
+import { quintOut } from 'svelte/easing';
+import { crossfade } from 'svelte/transition';
 
 function createSettingsStore() {
   const s = writable(0);
@@ -19,7 +19,6 @@ function createSettingsStore() {
 
 export const settings = createSettingsStore();
 
-/*
 export const shuffle = crossfade({
   fallback(node) {
     const style = getComputedStyle(node);
@@ -35,4 +34,3 @@ export const shuffle = crossfade({
     };
   },
 });
-*/

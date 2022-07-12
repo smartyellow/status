@@ -2,10 +2,10 @@
   import { onMount } from 'svelte';
   import TileRawValue from './tile-rawvalue.svelte';
   import Settings from './settings.svelte';
-  //import { flip } from 'svelte/animate';
-  //import { shuffle } from './lib';
+  import { flip } from 'svelte/animate';
+  import { shuffle } from './lib';
 
-  //const [ send, receive ] = shuffle;
+  const [ send, receive ] = shuffle;
   const size = 3 * 4 - 1;
   let pageNum = -1;
   let tiles = [];
@@ -87,24 +87,14 @@
       <TileRawValue value={time} center weight={200} />
 
       {#each tiles as tile (tile.id)}
-        <TileRawValue {...tileProps(tile)} />
-      {/each}
-      <!--{#each servicesUp as service (service.id)}
-        <TileRawValue {...tileProps(service)} />
-      {/each}
-      {#each servicesUnknown as service (service.id)}
-        <TileRawValue {...tileProps(service)} />
-      {/each}-->
-
-      <!--{#each services as service (service.id)}
         <div
-          in:receive={{ key: service.id }}
-          out:send={{ key: service.id }}
+          in:receive={{ key: tile.id }}
+          out:send={{ key: tile.id }}
           animate:flip
         >
-          <TileRawValue {...tileProps(service)} />
+          <TileRawValue {...tileProps(tile)} />
         </div>
-      {/each}-->
+      {/each}
     </div>
   </div>
 </div>
@@ -127,14 +117,27 @@
     top: 50%;
     transform: translate(-50%,-50%);
     width: 100vw;
+    margin: 1rem 0;
+    display: flex;
+    justify-content: center;
   }
 
   .tiles {
-    margin: 1rem;
     display: grid;
     grid-template-columns: repeat(var(--cols), 1fr);
     grid-template-rows: repeat(var(--rows), 1fr);
     gap: 1rem;
     justify-items: stretch;
+    height: calc(100% - 2rem);
+    width: calc(100% - 2rem);
+  }
+
+  .tiles > * {
+    display: flex;
+    align-items: stretch;
+  }
+
+  .tiles > * > :global(.tile) {
+    width: 100%;
   }
 </style>
