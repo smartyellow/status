@@ -3,13 +3,14 @@
   import TileRawValue from './tile-rawvalue.svelte';
   import Settings from './settings.svelte';
   import { flip } from 'svelte/animate';
-  import { settings, shuffle, ringBell } from './lib';
+  import { proportionalGrid, settings, shuffle, ringBell } from './lib';
 
   const [ send, receive ] = shuffle;
-  const size = ($settings.cols || 4) * ($settings.rows || 3) - 1;
+  let size = ($settings.cols || 4) * ($settings.rows || 3) - 1;
   let pageNum = -1;
   let tiles = [];
   let time = '';
+  let globalData = {};
 
   function tileProps(service) {
     let props = {
@@ -38,6 +39,31 @@
     return props;
   }
 
+  function organiseGrid() {
+    let servicesTemp = [];
+    const { servicesUp, servicesDown, servicesUnknown, total } = globalData;
+    const upOrUnknown = [ ...servicesUp, ...servicesUnknown ];
+    servicesTemp = servicesDown.slice(0, size);
+
+    if (pageNum === -1 || total >= size) {
+      pageNum++;
+
+      if (pageNum > Math.ceil(upOrUnknown.length / size)) {
+        pageNum = 0;
+      }
+    }
+
+    const placesLeft = size - servicesTemp.length;
+    const offset = placesLeft * pageNum;
+    if (placesLeft > 0) {
+      servicesTemp.push(
+        ...upOrUnknown.slice(offset, placesLeft + offset)
+      );
+    }
+
+    tiles = servicesTemp;
+  }
+
   onMount(() => {
     const ws = new WebSocket('ws://__SERVER__/statusdashboard/socket');
 
@@ -46,28 +72,8 @@
 
       switch (data.cmd) {
         case 'data':
-          let servicesTemp = [];
-          const { servicesUp, servicesDown, servicesUnknown, total } = data;
-          const upOrUnknown = [ ...servicesUp, ...servicesUnknown ];
-          servicesTemp = servicesDown.slice(0, size);
-
-          if (pageNum === -1 || total >= size) {
-            pageNum++;
-
-            if (pageNum > Math.ceil(upOrUnknown.length / size)) {
-              pageNum = 0;
-            }
-          }
-
-          const placesLeft = size - servicesTemp.length;
-          const offset = placesLeft * pageNum;
-          if (placesLeft > 0) {
-            servicesTemp.push(
-              ...upOrUnknown.slice(offset, placesLeft + offset)
-            );
-          }
-
-          tiles = servicesTemp;
+          globalData = data;
+          organiseGrid();
           break;
 
         case 'bell':
@@ -85,10 +91,16 @@
       });
     }, 100);
 
+    settings.subscribe(s => {
+      size = (s.cols || 4) * (s.rows || 3) - 1;
+      organiseGrid();
+    });
+
     return () => clearInterval(clockInterval);
   });
 </script>
 
+<svelte:window on:resize={proportionalGrid} />
 <Settings />
 
 <div

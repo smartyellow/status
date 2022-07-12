@@ -19,7 +19,7 @@ function createSettingsStore() {
   return {
     subscribe: s.subscribe,
     set: val => updateStorage(val),
-    update: val => updateStorage({ ...get(s), val }),
+    update: val => updateStorage({ ...get(s), ...val }),
   };
 }
 
@@ -64,4 +64,20 @@ export function formatDuration(ms) {
     .filter(val => val[1] !== 0)
     .map(([ key, val ]) => `${val} ${key}`)
     .join(' ');
+}
+
+export function proportionalGrid() {
+  const container = document.querySelector('.center');
+  const w = container.clientWidth;
+  const h = container.clientHeight;
+  const tileW = 400;
+  const tileH = 300;
+  const availableCols = Math.floor(w / tileW);
+  const availableRows = Math.floor(h / tileH);
+  console.log(w, h, availableCols, availableRows);
+
+  settings.update({
+    cols: availableCols,
+    rows: availableRows,
+  });
 }
