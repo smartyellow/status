@@ -6,13 +6,10 @@
   //import { shuffle } from './lib';
 
   //const [ send, receive ] = shuffle;
-  const size = 3 * 4;
-  let lastUpdated = new Date();
-  let lastUpdatedFormatted = '';
-  let servicesUp = [];
-  let servicesDown = [];
-  let servicesUnknown = [];
+  const size = 3 * 4 - 1;
   let pageNum = -1;
+  let tiles = [];
+  let time = '';
 
   function tileProps(service) {
     let props = {
@@ -46,22 +43,39 @@
     ws.onmessage = async evt => {
       const data = JSON.parse(evt.data || '""');
 
-      switch (data.cmd) {
-        case 'time':
-          lastUpdated = new Date(data.time);
-          lastUpdatedFormatted = lastUpdated.toLocaleTimeString('en-GB', {
-            timeStyle: 'short',
-          });
-          break;
+      if (data.cmd === 'data') {
+        let servicesTemp = [];
+        const { servicesUp, servicesDown, servicesUnknown, total } = data;
+        const upOrUnknown = [ ...servicesUp, ...servicesUnknown ];
+        servicesTemp = servicesDown.slice(0, size);
 
-        case 'data':
-          ({ servicesUp, servicesDown, servicesUnknown } = data);
-          break;
+        if (pageNum === -1 || total >= size) {
+          pageNum++;
 
-        default:
-          break;
+          if (pageNum > Math.ceil(upOrUnknown.length / size)) {
+            pageNum = 0;
+          }
+        }
+
+        const placesLeft = size - servicesTemp.length;
+        const offset = placesLeft * pageNum;
+        if (placesLeft > 0) {
+          servicesTemp.push(
+            ...upOrUnknown.slice(offset, placesLeft + offset)
+          );
+        }
+
+        tiles = servicesTemp;
       }
     }
+
+    const clockInterval = setInterval(() => {
+      time = new Date().toLocaleTimeString('en-GB', {
+        timeStyle: 'medium',
+      });
+    }, 100);
+
+    return () => clearInterval(clockInterval);
   });
 </script>
 
@@ -70,17 +84,17 @@
 <div class="center">
   <div class="ratio">
     <div class="tiles">
-      <TileRawValue title="Last updated" value={lastUpdatedFormatted} />
+      <TileRawValue value={time} center weight={200} />
 
-      {#each servicesDown as service (service.id)}
-        <TileRawValue {...tileProps(service)} />
+      {#each tiles as tile (tile.id)}
+        <TileRawValue {...tileProps(tile)} />
       {/each}
-      {#each servicesUp as service (service.id)}
+      <!--{#each servicesUp as service (service.id)}
         <TileRawValue {...tileProps(service)} />
       {/each}
       {#each servicesUnknown as service (service.id)}
         <TileRawValue {...tileProps(service)} />
-      {/each}
+      {/each}-->
 
       <!--{#each services as service (service.id)}
         <div

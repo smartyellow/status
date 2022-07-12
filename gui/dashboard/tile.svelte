@@ -35,6 +35,8 @@
     background-color: var(--tile-bg);
     border-radius: var(--radius);
     border: 2px solid var(--tile-bg);
+    display: flex;
+    flex-direction: column;
   }
 
   .tile.red {
@@ -74,5 +76,9 @@
   .desc .time {
     opacity: 0.6;
     margin-left: auto;
+  }
+
+  .content {
+    flex-grow: 1;
   }
 </style>
