@@ -12,10 +12,10 @@ function createSettingsStore() {
   const s = writable(defaults);
 
   function updateStorage(val) {
-    window.localStorage.setItem('statusdash', {
+    window.localStorage.setItem('statusdash', JSON.stringify({
       ...defaults,
       ...JSON.stringify(val),
-    });
+    }));
     s.set(val);
   }
 
