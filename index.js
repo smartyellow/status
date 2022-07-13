@@ -537,7 +537,7 @@ module.exports = {
       handler: async (req, res) => {
         try {
           if (!renderedDashboard) {
-            renderedDashboard = await buildDashboard({ server, settings });
+            renderedDashboard = await buildDashboard();
             renderedDashboard.globalCss = await readFile(
               __dirname + '/gui/dashboard/app.css'
             );
