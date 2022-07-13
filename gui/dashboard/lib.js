@@ -19,7 +19,17 @@ function createSettingsStore() {
     s.set(val);
   }
 
-  updateStorage(JSON.parse(window.localStorage.getItem('statusdash')));
+  const localStorageString = window.localStorage.getItem('statusdash');
+  let localStorage = {};
+
+  try {
+    localStorage = JSON.parse(localStorageString);
+  }
+  catch {
+    localStorage = {};
+  }
+
+  updateStorage(localStorage);
 
   return {
     subscribe: s.subscribe,
