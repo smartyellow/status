@@ -194,7 +194,6 @@ module.exports = {
             server.error(message.error);
           }
           else if (message.outage) {
-            console.log('outage', message.outage);
             processOutage({ outage: message.outage, server, settings });
           }
         });
