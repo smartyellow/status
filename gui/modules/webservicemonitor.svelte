@@ -21,7 +21,7 @@ let webservices = [];
 async function refresh() {
   console.log('refresh');
   try {
-    webservices = await api.get('/webservices');
+    webservices = await api.get('/status/webservices');
   }
   catch (err) {
     console.error(err);

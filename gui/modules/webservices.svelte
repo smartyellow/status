@@ -76,19 +76,19 @@ onMount(async function () {
       // get item, form and log for specified id
       try {
         // get settings, to read previewUrl
-        settings = await api.get('/webservices/settings');
-        ({ item, form, log } = isNew ? await api.post('/webservices', {}, { init: true }) : await api.get('/webservices/' + id));
+        settings = await api.get('/status/webservices/settings');
+        ({ item, form, log } = isNew ? await api.post('/status/webservices', {}, { init: true }) : await api.get('/status/webservices/' + id));
         // if existing item, set tabtitle to title of item
         if (!isNew) {
           dispatch('tabchanged', { title: item.name });
         }
         api.subscribe(pluginName + '/reload', async msg => {
           if (msg.id == item.id) {
-            ({ item, form, log } = await api.get('/webservices' + id));
+            ({ item, form, log } = await api.get('/status/webservices' + id));
           }
         });
         api.subscribe(entity + '/reload', async () => {
-          ({ form, log } = await api.get('/webservices/' + id));
+          ({ form, log } = await api.get('/status/webservices/' + id));
         });
       }
       catch (e) {
@@ -99,8 +99,8 @@ onMount(async function () {
       }
     }
     else {
-      filters = await api.get('/webservices/filters');
-      gridOptions.columns = await api.get('/webservices/formats');
+      filters = await api.get('/status/webservices/filters');
+      gridOptions.columns = await api.get('/status/webservices/formats');
       // subscribe to 'reload' message
       api.subscribe(pluginName + '/reload', async () => {
         multifilter.submit();
@@ -131,8 +131,8 @@ async function saveChanges() {
     // save changes for web service in form
     savebar.start();
     const result = isNew ?
-      await api.post('/webservices', item) :
-      await api.put('/webservices/' + item.id, item);
+      await api.post('/status/webservices', item) :
+      await api.put('/status/webservices/' + item.id, item);
     savebar.stop(result);
     if (!result.errors) {
       log = result.log;
@@ -148,7 +148,7 @@ async function submitFilters({ detail }) {
   if (grid) {
     grid.reset();
   }
-  items = await api.post('/webservices/search', detail);
+  items = await api.post('/status/webservices/search', detail);
 }
 
 async function deleteItem() {
@@ -158,7 +158,7 @@ async function deleteItem() {
         msg: translate('Are you sure you want to delete this item?', language),
       });
       dispatch('close');
-      await api.delete('/webservices/' + item.id);
+      await api.delete('/status/webservices/' + item.id);
     }
     catch (e) {
       console.log(e);

@@ -76,19 +76,19 @@ onMount(async function () {
       // get item, form and log for specified id
       try {
         // get settings, to read previewUrl
-        settings = await api.get('/outages/settings');
-        ({ item, form, log } = isNew ? await api.post('/outages', {}, { init: true }) : await api.get('/outages/' + id));
+        settings = await api.get('/status/outages/settings');
+        ({ item, form, log } = isNew ? await api.post('/status/outages', {}, { init: true }) : await api.get('/status/outages/' + id));
         // if existing item, set tabtitle to title of item
         if (!isNew) {
           dispatch('tabchanged', { title: item.name });
         }
         api.subscribe(pluginName + '/reload', async msg => {
           if (msg.id == item.id) {
-            ({ item, form, log } = await api.get('/outages' + id));
+            ({ item, form, log } = await api.get('/status/outages' + id));
           }
         });
         api.subscribe(entity + '/reload', async () => {
-          ({ form, log } = await api.get('/outages/' + id));
+          ({ form, log } = await api.get('/status/outages/' + id));
         });
       }
       catch (e) {
@@ -99,8 +99,8 @@ onMount(async function () {
       }
     }
     else {
-      filters = await api.get('/outages/filters');
-      gridOptions.columns = await api.get('/outages/formats');
+      filters = await api.get('/status/outages/filters');
+      gridOptions.columns = await api.get('/status/outages/formats');
       // subscribe to 'reload' message
       api.subscribe(pluginName + '/reload', async () => {
         multifilter.submit();
@@ -131,8 +131,8 @@ async function saveChanges() {
     // save changes for outage in form
     savebar.start();
     const result = isNew ?
-      await api.post('/outages', item) :
-      await api.put('/outages/' + item.id, item);
+      await api.post('/status/outages', item) :
+      await api.put('/status/outages/' + item.id, item);
     savebar.stop(result);
     if (!result.errors) {
       log = result.log;
@@ -148,7 +148,7 @@ async function submitFilters({ detail }) {
   if (grid) {
     grid.reset();
   }
-  items = await api.post('/outages/search', detail);
+  items = await api.post('/status/outages/search', detail);
 }
 
 async function deleteItem() {
@@ -158,7 +158,7 @@ async function deleteItem() {
         msg: translate('Are you sure you want to delete this item?', language),
       });
       dispatch('close');
-      await api.delete('/outages/' + item.id);
+      await api.delete('/status/outages/' + item.id);
     }
     catch (e) {
       console.log(e);

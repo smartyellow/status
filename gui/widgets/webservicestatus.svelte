@@ -18,7 +18,7 @@ const icons = {
 let promise;
 
 async function refresh() {
-  promise = await api.get('/webservices');
+  promise = await api.get('/status/webservices');
 }
 
 onMount(() => {

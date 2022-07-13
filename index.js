@@ -239,7 +239,7 @@ module.exports = {
   routes: ({ server, settings }) => [
 
     // Get all services
-    { route: '/webservices',
+    { route: '/status/webservices',
       method: 'get',
       requires: 'smartyellow/status/seeServices',
       handler: async (req, res, user) => {
@@ -270,7 +270,7 @@ module.exports = {
     },
 
     // Get details for specific service
-    { route: '/webservices/:id',
+    { route: '/status/webservices/:id',
       method: 'get',
       requires: 'smartyellow/status/seeServices',
       handler: async (req, res, user) => {
@@ -287,7 +287,7 @@ module.exports = {
       },
     },
 
-    { route: '/webservices/search',
+    { route: '/status/webservices/search',
       method: 'post',
       requires: 'smartyellow/status/seeServices',
       handler: async (req, res, user) => {
@@ -302,7 +302,7 @@ module.exports = {
     },
 
     // Get filters for services
-    { route: '/webservices/filters',
+    { route: '/status/webservices/filters',
       method: 'get',
       requires: 'smartyellow/status/seeServices',
       handler: async (req, res, user) => {
@@ -314,7 +314,7 @@ module.exports = {
     },
 
     // Get formats for services
-    { route: '/webservices/formats',
+    { route: '/status/webservices/formats',
       method: 'get',
       requires: 'smartyellow/status/seeServices',
       handler: async (req, res, user) => {
@@ -327,7 +327,7 @@ module.exports = {
     },
 
     // Create new service
-    { route: '/webservices',
+    { route: '/status/webservices',
       method: 'post',
       requires: 'smartyellow/status/createServices',
       handler: async (req, res, user) => {
@@ -353,7 +353,7 @@ module.exports = {
     },
 
     // Update existing service
-    { route: '/webservices/:id',
+    { route: '/status/webservices/:id',
       method: 'put',
       requires: 'smartyellow/status/editServices',
       handler: async (req, res, user) => {
@@ -380,7 +380,7 @@ module.exports = {
     },
 
     // Delete specific service
-    { route: '/webservices/:id',
+    { route: '/status/webservices/:id',
       method: 'delete',
       requires: 'smartyellow/status/deleteServices',
       handler: async (req, res, user) => {
@@ -396,7 +396,7 @@ module.exports = {
     },
 
     // Get all outages
-    { route: '/outages',
+    { route: '/status/outages',
       method: 'get',
       requires: 'smartyellow/status/seeOutages',
       handler: async (req, res, user) => {
@@ -407,7 +407,7 @@ module.exports = {
     },
 
     // Get details for specific outage
-    { route: '/outages/:id',
+    { route: '/status/outages/:id',
       method: 'get',
       requires: 'smartyellow/status/seeOutages',
       handler: async (req, res, user) => {
@@ -424,7 +424,7 @@ module.exports = {
       },
     },
 
-    { route: '/outages/search',
+    { route: '/status/outages/search',
       method: 'post',
       requires: 'smartyellow/status/seeOutages',
       handler: async (req, res, user) => {
@@ -439,7 +439,7 @@ module.exports = {
     },
 
     // Get filters for outages
-    { route: '/outages/filters',
+    { route: '/status/outages/filters',
       method: 'get',
       requires: 'smartyellow/status/seeOutages',
       handler: async (req, res, user) => {
@@ -451,7 +451,7 @@ module.exports = {
     },
 
     // Get formats for outages
-    { route: '/outages/formats',
+    { route: '/status/outages/formats',
       method: 'get',
       requires: 'smartyellow/status/seeOutages',
       handler: async (req, res, user) => {
@@ -464,7 +464,7 @@ module.exports = {
     },
 
     // Create new service
-    { route: '/outages',
+    { route: '/status/outages',
       method: 'post',
       requires: 'smartyellow/status/createOutages',
       handler: async (req, res, user) => {
@@ -490,7 +490,7 @@ module.exports = {
     },
 
     // Update existing service
-    { route: '/outages/:id',
+    { route: '/status/outages/:id',
       method: 'put',
       requires: 'smartyellow/status/editOutages',
       handler: async (req, res, user) => {
@@ -517,7 +517,7 @@ module.exports = {
     },
 
     // Delete specific service
-    { route: '/outages/:id',
+    { route: '/status/outages/:id',
       method: 'delete',
       requires: 'smartyellow/status/deleteOutages',
       handler: async (req, res, user) => {
@@ -532,7 +532,7 @@ module.exports = {
       },
     },
 
-    { route: '/statusdashboard',
+    { route: '/status/dashboard',
       method: 'get',
       handler: async (req, res) => {
         try {
@@ -569,7 +569,7 @@ module.exports = {
       },
     },
 
-    { route: '/statusdashboard/sound',
+    { route: '/status/dashboard/sound',
       method: 'get',
       handler: (req, res) => {
         res.headers['content-type'] = 'audio/x-wav';

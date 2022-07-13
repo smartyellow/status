@@ -45,7 +45,7 @@ function openOutage(title, id) {
 }
 
 onMount(async () => {
-  outages = (await api.get('/outages')).filter(o => o.services?.includes(service));
+  outages = (await api.get('/status/outages')).filter(o => o.services?.includes(service));
 });
 
 </script>

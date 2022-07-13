@@ -88,7 +88,7 @@
 
   onMount(() => {
     proportionalGrid();
-    const ws = new WebSocket('ws://__SERVER__/statusdashboard/socket');
+    const ws = new WebSocket('ws://__SERVER__/status/dashboard/socket');
 
     ws.onmessage = async evt => {
       const data = JSON.parse(evt.data || '""');
