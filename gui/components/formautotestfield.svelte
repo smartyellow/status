@@ -15,7 +15,13 @@ const dispatch = createEventDispatcher();
 const defaultEndpoint = {
   uri: '',
   headers: [],
-  requirements: [],
+  requirements: [
+    { type: 'httpstatus',
+      truth: 'true',
+      operator: 'equal',
+      string: '200'
+    },
+  ],
 };
 const defaultReq = {
   type: 'httpstatus',
