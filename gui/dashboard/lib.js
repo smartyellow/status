@@ -42,7 +42,7 @@ export const shuffle = crossfade({
 });
 
 export function ringBell() {
-  const bell = new Audio('http://__SERVER__/statusdashboard/sound');
+  const bell = new Audio(window.location.href + '/sound');
   bell.addEventListener('canplaythrough', () => bell.play());
 }
 
