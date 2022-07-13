@@ -4,12 +4,14 @@ import { createEventDispatcher } from 'svelte';
 import Toggle from 'components/webdesq/toggle.svelte';
 import { operatorNames } from '../../lib/operators';
 import { realValueNames } from '../../lib/realvalues';
+import { fade } from 'svelte/transition';
 
 export let value = [];
 export let specs = {};
 export let readonly = true;
 export let language = 'en';
 export let translate = s => s;
+export let error = false;
 
 const dispatch = createEventDispatcher();
 const defaultEndpoint = {
@@ -219,6 +221,10 @@ function removeEndpoint(i) {
     {translate('add endpoint', language)}
   </button>
 </div>
+
+{#if error}
+  <span transition:fade class="error">{error}</span>
+{/if}
 
 <style>
   div:not(:last-child) {

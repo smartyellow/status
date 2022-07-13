@@ -353,7 +353,7 @@ module.exports = {
           return 'autotest must be an array';
         }
         else if (newValues.autotest) {
-          for (const [ iEndpoint, endpoint ] of newValues.autotest.entries()) {
+          for (const endpoint of newValues.autotest) {
             if (!url.test(endpoint.uri)) {
               return 'not a valid url';
             }
@@ -365,10 +365,10 @@ module.exports = {
             const foundHeaders = [];
             for (const header of endpoint.headers) {
               if (foundHeaders.includes(header.name)) {
-                return 'found duplicate headers in endpoint #' + iEndpoint;
+                return 'found duplicate headers in endpoint ' + endpoint.uri;
               }
               else if (!header.name || !header.name.trim || !header.name.trim()) {
-                return 'empty header name in endpoint #' + iEndpoint;
+                return 'empty header name in endpoint ' + endpoint.uri;
               }
               else {
                 foundHeaders.push(header.name);
