@@ -4,8 +4,8 @@ const { makeId } = require('core/makeid');
 
 const states = {
   concept: 'concept',
-  online: 'online',
-  offline: 'offline',
+  enabled: 'enabled',
+  disabled: 'disabled',
 };
 
 module.exports = {
@@ -18,7 +18,7 @@ module.exports = {
   forms: ({ settings }) => ({
     default: {
       pages: [
-        { label: 'meta',
+        { label: 'about',
           sections: [
             'id',
             'name',
@@ -27,25 +27,18 @@ module.exports = {
             'cluster',
             'tags',
             'channels',
-          ],
-        },
-        { label: 'description',
-          sections: [
             'summary',
-            'visual',
-            'body',
           ],
         },
         { label: 'auto testing',
           sections: [
-            'autotestEnabled',
             'autotestInterval',
-            'lastChecked',
             'autotest',
           ],
         },
         { label: 'statistics',
           sections: [
+            'lastChecked',
             'outageStats',
             'outageTable',
           ],
@@ -87,7 +80,7 @@ module.exports = {
         },
 
         public: {
-          label: 'is public?',
+          label: 'publish?',
           hint: 'If checked, this service will be shown on the status dashboard.',
           fields: [
             { key: 'public',
@@ -134,32 +127,11 @@ module.exports = {
 
         summary: {
           label: 'summary',
+          hint: 'A short summary of what this web service is about.',
           fields: [
             { key: 'summary',
               editor: 'text',
               localized: true,
-            },
-          ],
-        },
-
-        body: {
-          label: 'body',
-          fields: [
-            { key: 'body',
-              editor: 'text',
-              type: 'string',
-              localized: true,
-              markup: true,
-            },
-          ],
-        },
-
-        visual: {
-          label: 'visual',
-          fields: [
-            { key: 'visual',
-              editor: 'file',
-              accept: [ 'image/*' ],
             },
           ],
         },
@@ -209,15 +181,6 @@ module.exports = {
           fields: [
             { key: 'id',
               editor: 'smartyellow/outagetable',
-            },
-          ],
-        },
-
-        autotestEnabled: {
-          label: 'autotesting enabled?',
-          fields: [
-            { key: 'autotestEnabled',
-              editor: 'checkbox',
             },
           ],
         },
@@ -381,58 +344,8 @@ module.exports = {
       default: '',
     },
 
-    body: {
-      type: 'stringset',
-      default: '',
-      filter: {
-        title: 'message contains',
-        match: '[a-z0-9A-Z]*',
-        localized: true,
-      },
-    },
-
     autotest: {
       default: [],
-    },
-
-    visual: {
-      type: 'array',
-      of: [ 'string' ],
-      default: [],
-      skip: true,
-      onDataValid: async ({ newValues, storage, user }) => {
-        newValues.visual = newValues.visual || [];
-        for (let i = 0; i < newValues.visual.length; i++) {
-          if (newValues.visual[i].data) {
-            if (storage) {
-              // If storage is available, insert the new file into storage and collect id
-              const result = await storage({ user }).bucket('webdesq/media').insert({
-                id: makeId(6),
-                filename: newValues.visual[i].name,
-                metadata: {
-                  contentType: newValues.visual[i].type,
-                },
-              }, newValues.visual[i].data)
-                .catch(error => {
-                  if (error.code !== 'DUPLICATE_FILE') {
-                    throw error;
-                  }
-                  newValues.visual[i] = error.file.id;
-                });
-              if (result) {
-                newValues.visual[i] = result.id;
-              }
-            }
-            else {
-              // If no storage is available, remove slot by setting it to null
-              newValues.visual[i] = null;
-            }
-          }
-          // remove empty slots in photo array
-          newValues.visual = newValues.visual.filter(i => i != null);
-          newValues.visual = [ ...new Set(newValues.visual) ];
-        }
-      },
     },
 
     outages: {
