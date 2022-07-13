@@ -34,8 +34,8 @@ const defaultHeader = {
   value: '',
 };
 
-const changeValue = () => dispatch('changeValue', value) && console.log(value);;
-const appendEndpoint = () => value = [...value, defaultEndpoint];
+const changeValue = e => dispatch('changeValue', value) && e.target.focus();
+const appendEndpoint = () => value = [ ...value, defaultEndpoint ];
 
 function removeEndpoint(i) {
   value.splice(i, 1);
@@ -146,9 +146,7 @@ function removeEndpoint(i) {
                   bind:value={req.type}
                   disabled={readonly}
                   on:focus
-                  on:keyup={changeValue}
                   on:change={changeValue}
-                  on:blur={changeValue}
                 >
                   {#each Object.keys(realValueNames) as valName}
                     <option value={valName}>{realValueNames[valName]}</option>
@@ -176,9 +174,7 @@ function removeEndpoint(i) {
                   bind:value={req.operator}
                   disabled={readonly}
                   on:focus
-                  on:keyup={changeValue}
                   on:change={changeValue}
-                  on:blur={changeValue}
                 >
                   {#each Object.keys(operatorNames) as opName}
                     <option value={opName}>{operatorNames[opName]}</option>
