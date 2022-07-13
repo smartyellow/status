@@ -31,7 +31,7 @@ module.exports = {
             'summary',
           ],
         },
-        { label: 'auto testing',
+        { label: 'endpoints to test',
           sections: [
             'autotestInterval',
             'autotest',
@@ -81,7 +81,7 @@ module.exports = {
         },
 
         public: {
-          label: 'publish?',
+          label: 'publish on dashboard?',
           hint: 'If checked, this service will be shown on the status dashboard.',
           fields: [
             { key: 'public',
