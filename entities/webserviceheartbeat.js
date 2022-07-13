@@ -17,10 +17,10 @@ module.exports = {
       trim: true,
       filter: {
         title: 'id',
-        match: '^[a-zA-Z0-9]{6}$',
+        match: '^[a-zA-Z0-9]{10}$',
         order: 999,
       },
-      default: () => makeId(6),
+      default: () => makeId(10),
       validate: async ({ newValues, oldValues, newEntity, storage }) => {
         if (newEntity) {
           const r = storage ? await storage.store('smartyellow/webserviceheartbeat').get(newValues.id) : null;

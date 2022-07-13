@@ -46,7 +46,7 @@ export const shuffle = crossfade({
     const transform = style.transform === 'none' ? '' : style.transform;
 
     return {
-      duration: 400,
+      duration: 100,
       easing: quintOut,
       css: t => `
         transform: ${transform} scale(${t});
@@ -58,7 +58,9 @@ export const shuffle = crossfade({
 
 export function ringBell() {
   const bell = new Audio(window.location.href + '/sound');
+  bell.loop = true;
   bell.addEventListener('canplaythrough', () => bell.play());
+  window.addEventListener('keydown', () => bell.pause());
 }
 
 export function formatDuration(ms) {

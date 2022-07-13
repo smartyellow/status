@@ -179,7 +179,7 @@ module.exports = {
         const services = await server
           .storage
           .store('smartyellow/webservice')
-          .find({ autotestEnabled: true })
+          .find()
           .toArray();
 
         if (!services.length) {
@@ -194,6 +194,7 @@ module.exports = {
             server.error(message.error);
           }
           else if (message.outage) {
+            console.log('outage', message.outage);
             processOutage({ outage: message.outage, server, settings });
           }
         });
