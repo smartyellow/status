@@ -1,6 +1,7 @@
 'use strict';
 
 const { makeId } = require('core/makeid');
+const { url } = require('core/types');
 
 const states = {
   concept: 'concept',
@@ -346,6 +347,42 @@ module.exports = {
 
     autotest: {
       default: [],
+      type: 'array',
+      validate: ({ newValues }) => {
+        if (newValues.autotest && !Array.isArray(newValues.autotest)) {
+          return 'autotest must be an array';
+        }
+        else if (newValues.autotest) {
+          for (const [ iEndpoint, endpoint ] of newValues.autotest.entries()) {
+            if (!url.test(endpoint.uri)) {
+              return 'not a valid url';
+            }
+
+            if (!Array.isArray(endpoint.headers)) {
+              return 'endpoint headers must be an array';
+            }
+
+            const foundHeaders = [];
+            for (const header of endpoint.headers) {
+              if (foundHeaders.includes(header.name)) {
+                return 'found duplicate headers in endpoint #' + iEndpoint;
+              }
+              else if (!header.name || !header.name.trim || !header.name.trim()) {
+                return 'empty header name in endpoint #' + iEndpoint;
+              }
+              else {
+                foundHeaders.push(header.name);
+              }
+            }
+
+            if (!Array.isArray(endpoint.requirements)) {
+              return 'requirements must be an object';
+            }
+          }
+        }
+
+        return true;
+      },
     },
 
     outages: {
