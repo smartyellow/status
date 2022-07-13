@@ -14,7 +14,7 @@ function createSettingsStore() {
   function updateStorage(val) {
     window.localStorage.setItem('statusdash', JSON.stringify({
       ...defaults,
-      ...JSON.stringify(val),
+      ...val,
     }));
     s.set(val);
   }

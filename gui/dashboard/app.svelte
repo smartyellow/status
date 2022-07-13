@@ -12,6 +12,8 @@
   let time = '';
   let globalData = {};
   let resizeTimer;
+  let automaticallyProportionalised = false;
+  let hasData = false;
 
   function onResize() {
     clearTimeout(resizeTimer);
@@ -26,7 +28,6 @@
     const tileH = 300;
     const availableCols = Math.floor(w / tileW);
     const availableRows = Math.floor(h / tileH);
-    console.log(w, h, availableCols, availableRows);
 
     settings.update({
       cols: availableCols,
@@ -87,8 +88,6 @@
   }
 
   onMount(() => {
-    proportionalGrid();
-
     const ws = new WebSocket(
       window.location.href.replace('http', 'ws') + '/socket'
     );
@@ -100,6 +99,11 @@
         case 'data':
           globalData = data;
           organiseGrid();
+          if (!automaticallyProportionalised) {
+            proportionalGrid();
+            automaticallyProportionalised = true;
+          }
+          hasData = true;
           break;
 
         case 'bell':
@@ -119,7 +123,7 @@
 
     settings.subscribe(s => {
       size = (s.cols || 4) * (s.rows || 3) - 1;
-      organiseGrid();
+      if (hasData) organiseGrid();
     });
 
     return () => clearInterval(clockInterval);
