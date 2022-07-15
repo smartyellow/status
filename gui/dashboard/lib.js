@@ -46,7 +46,7 @@ export const shuffle = crossfade({
     const transform = style.transform === 'none' ? '' : style.transform;
 
     return {
-      duration: 100,
+      duration: 300,
       easing: quintOut,
       css: t => `
         transform: ${transform} scale(${t});

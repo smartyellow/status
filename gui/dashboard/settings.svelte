@@ -18,11 +18,9 @@
   }
 </script>
 
-{#if !open}
-  <button class="settings" on:click={toggle}>
-    •
-  </button>
-{/if}
+<button class="settings" on:click={toggle}>
+  Settings
+</button>
 
 <Modal title="Settings" bind:open>
   <div class="mb">
@@ -57,11 +55,10 @@
 
 <style>
   button.settings {
-    position: fixed;
-    bottom: 0;
-    right: 0;
     opacity: 0.4;
     color: var(--body-fg);
+    padding: 0;
+    display: grid;
   }
 
   button.settings:hover {
