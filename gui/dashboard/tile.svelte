@@ -93,8 +93,9 @@
   }
 
   .desc .subtitle {
-    font-weight: 200;
+    font-weight: 300;
     font-size: 1.5vw;
+    opacity: 0.7;
   }
 
   .bottom {
