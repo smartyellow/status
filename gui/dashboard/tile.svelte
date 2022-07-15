@@ -7,7 +7,6 @@
   export let color;
   export let date;
   export let since;
-  export let center = false;
 
   let formattedDuration = '';
   $: formattedDate = date ? date.toLocaleTimeString('en-GB', {
@@ -29,7 +28,7 @@
   });
 </script>
 
-<div class="tile {color}" class:center>
+<div class="tile {color}">
   {#if title || subtitle}
     <div class="desc">
       {#if title}
@@ -42,7 +41,7 @@
     </div>
   {/if}
 
-  <div class="bottom" class:center>
+  <div class="bottom">
     <div class="content"><slot /></div>
     {#if date || since}
       <div class="time">
@@ -84,11 +83,6 @@
     color: var(--grey);
   }
 
-  .tile.center {
-    align-items: center;
-    justify-content: center;
-  }
-
   .desc {
     margin-bottom: 1rem;
   }
@@ -121,14 +115,5 @@
   .bottom .content {
     flex-grow: 1;
     display: flex;
-  }
-
-  .bottom.center {
-    margin-top: 0;
-  }
-
-  .bottom.center .content {
-    justify-content: center;
-    align-items: center;
   }
 </style>

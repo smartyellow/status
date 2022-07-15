@@ -7,11 +7,10 @@
   export let value;
   export let date;
   export let since;
-  export let center = false;
   export let weight = 600;
 </script>
 
-<Tile {title} {subtitle} {color} {date} {since} {center}>
+<Tile {title} {subtitle} {color} {date} {since}>
   <div class="value {color}" style:font-weight={weight}>
     {value}
   </div>

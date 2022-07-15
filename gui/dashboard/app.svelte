@@ -6,7 +6,7 @@
   import { settings, shuffle, ringBell } from './lib';
 
   const [ send, receive ] = shuffle;
-  let size = ($settings.cols || 4) * ($settings.rows || 3) - 1;
+  let size = ($settings.cols || 4) * ($settings.rows || 3);
   let pageNum = -1;
   let tiles = [];
   let time = '';
@@ -139,8 +139,6 @@
 >
   <div class="ratio">
     <div class="tiles">
-      <TileRawValue value={time} center weight={200} />
-
       {#each tiles as tile (tile.id)}
         <div
           in:receive={{ key: tile.id }}
