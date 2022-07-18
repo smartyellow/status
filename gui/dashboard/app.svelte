@@ -10,7 +10,6 @@
   let placesLeft = size;
   let pageNum = -1;
   let pageCount = 1;
-  let pageCountFreePlaces = 1;
   let tiles = [];
   let time = '';
   let globalData = {};
@@ -50,12 +49,12 @@
     servicesTemp = servicesDown.slice(0, size);
     pageCount = Math.ceil(upOrUnknown.length / size);
     placesLeft = size - servicesTemp.length;
-    pageCountFreePlaces = Math.ceil(upOrUnknown.length / placesLeft);
+    pageCount = Math.ceil(upOrUnknown.length / placesLeft);
 
     if (pageNum === -1 || total >= size) {
       pageNum++;
 
-      if (pageNum > pageCount) {
+      if (pageNum >= pageCount) {
         pageNum = 0;
       }
     }
@@ -132,9 +131,12 @@
 
     <div class="footer">
       <div class="time">{time}</div>
-      {#if pageCountFreePlaces > 1}
+      {#if pageCount > 1}
+        <div>
+          {pageNum + 1}/{pageCount}
+        </div>
         <div class="pagination">
-          {#each Array(pageCountFreePlaces).fill('') as _, i}
+          {#each Array(pageCount).fill('') as _, i}
             <em class:active={pageNum === i}></em>
           {/each}
         </div>
@@ -190,6 +192,7 @@
     justify-content: space-between;
     height: 50px;
     font-size: 1.2em;
+    align-items: flex-end;
   }
 
   .pagination em {
