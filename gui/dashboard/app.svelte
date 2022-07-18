@@ -14,29 +14,7 @@
   let tiles = [];
   let time = '';
   let globalData = {};
-  let resizeTimer;
-  let automaticallyProportionalised = false;
   let hasData = false;
-  let centerEl;
-
-  function onResize() {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(proportionalGrid, 750);
-  }
-
-  function proportionalGrid() {
-    const w = centerEl.clientWidth;
-    const h = centerEl.clientHeight;
-    const tileW = 400;
-    const tileH = 300;
-    const availableCols = Math.floor(w / tileW);
-    const availableRows = Math.floor(h / tileH);
-
-    settings.update({
-      cols: availableCols,
-      rows: availableRows,
-    });
-  }
 
   function tileProps(service) {
     let props = {
@@ -104,10 +82,6 @@
         case 'data':
           globalData = data;
           organiseGrid();
-          if (!automaticallyProportionalised) {
-            proportionalGrid();
-            automaticallyProportionalised = true;
-          }
           hasData = true;
           break;
 
@@ -135,12 +109,9 @@
   });
 </script>
 
-<svelte:window on:resize={onResize} />
-
 <div
   class="center theme-{$settings.theme}"
   style="--cols: {$settings.cols || 4}; --rows: {$settings.rows || 3};"
-  bind:this={centerEl}
 >
   <div class="ratio">
     <div class="content">
