@@ -7,6 +7,7 @@ function createSettingsStore() {
     theme: 'dark',
     cols: 4,
     rows: 3,
+    fontSize: 1,
   };
 
   const s = writable(defaults);

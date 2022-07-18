@@ -18,7 +18,7 @@
 
 <style>
   .value {
-    font-size: 3vw;
+    font-size: 3em;
     font-weight: 600;
     margin-top: auto;
   }

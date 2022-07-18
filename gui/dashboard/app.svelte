@@ -111,33 +111,35 @@
 
 <div
   class="center theme-{$settings.theme}"
-  style="--cols: {$settings.cols || 4}; --rows: {$settings.rows || 3};"
+  style="
+    --cols: {$settings.cols || 4};
+    --rows: {$settings.rows || 3};
+    font-size: {$settings.fontSize}rem;
+  "
 >
   <div class="ratio">
-    <div class="content">
-      <div class="tiles">
-        {#each tiles as tile (tile.id)}
-          <div
-            in:receive={{ key: tile.id }}
-            out:send={{ key: tile.id }}
-            animate:flip
-          >
-            <TileRawValue {...tileProps(tile)} />
-          </div>
-        {/each}
-      </div>
+    <div class="tiles">
+      {#each tiles as tile (tile.id)}
+        <div
+          in:receive={{ key: tile.id }}
+          out:send={{ key: tile.id }}
+          animate:flip
+        >
+          <TileRawValue {...tileProps(tile)} />
+        </div>
+      {/each}
+    </div>
 
-      <div class="footer">
-        <div class="time">{time}</div>
-        {#if pageCountFreePlaces > 1}
-          <div class="pagination">
-            {#each Array(pageCountFreePlaces).fill('') as _, i}
-              <em class:active={pageNum === i}></em>
-            {/each}
-          </div>
-        {/if}
-        <Settings />
-      </div>
+    <div class="footer">
+      <div class="time">{time}</div>
+      {#if pageCountFreePlaces > 1}
+        <div class="pagination">
+          {#each Array(pageCountFreePlaces).fill('') as _, i}
+            <em class:active={pageNum === i}></em>
+          {/each}
+        </div>
+      {/if}
+      <Settings />
     </div>
   </div>
 </div>
@@ -154,24 +156,14 @@
   }
 
   .ratio {
-    height: 56.25vw;
+    height: calc(56.25vw - 2rem);
     left: 50%;
-    max-height: 100vh;
-    max-width: 177.77778vh;
+    max-height: calc(100vh - 2rem);
+    max-width: calc(177.77778vh - 2rem);
     position: absolute;
     top: 50%;
     transform: translate(-50%,-50%);
-    width: 100vw;
-    margin: 1rem 0;
-    display: flex;
-    justify-content: center;
-  }
-
-  .content {
-    display: grid;
-    grid-template-rows: 1fr 40px;
-    gap: 0.5rem;
-    width: calc(100% - 2rem);
+    width: calc(100vw - 2rem);
   }
 
   .tiles {
@@ -179,7 +171,9 @@
     grid-template-columns: repeat(var(--cols), 1fr);
     grid-template-rows: repeat(var(--rows), 1fr);
     gap: 1rem;
-    justify-items: stretch;
+    align-items: stretch;
+    justify-content: stretch;
+    height: calc(100% - 50px);
   }
 
   .tiles > * {
@@ -194,13 +188,15 @@
   .footer {
     display: flex;
     justify-content: space-between;
+    height: 50px;
+    font-size: 1.2em;
   }
 
   .pagination em {
     display: inline-block;
     margin-left: 0.5rem;
-    height: 5px;
-    width: 5px;
+    height: 10px;
+    width: 10px;
     border-radius: 5px;
     background-color: #fff;
     opacity: 0.4;

@@ -50,6 +50,7 @@
     max-width: 500px;
     z-index: 11;
     color: var(--body-fg);
+    font-size: 1.1rem;
   }
 
   .header {

@@ -44,12 +44,17 @@
 
   <label>
     Columns
-    <input type="number" bind:value={$settings.cols} width="10">
+    <input type="number" bind:value={$settings.cols} width="10" />
   </label>
 
   <label>
     Rows
-    <input type="number" bind:value={$settings.rows} width="10">
+    <input type="number" bind:value={$settings.rows} width="10" />
+  </label>
+
+  <label>
+    Font size (REMs)
+    <input type="number" bind:value={$settings.fontSize} width="10" step="0.1" />
   </label>
 </Modal>
 

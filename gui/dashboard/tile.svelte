@@ -89,12 +89,12 @@
 
   .desc .title {
     font-weight: 300;
-    font-size: 1.7vw;
+    font-size: 1.3em;
   }
 
   .desc .subtitle {
     font-weight: 300;
-    font-size: 1.5vw;
+    font-size: 1.1em;
     opacity: 0.7;
   }
 
@@ -106,7 +106,7 @@
   .bottom .time {
     margin: auto 0 0 auto;
     opacity: 0.6;
-    font-size: 1.3vw;
+    font-size: 1em;
     text-align: right;
     display: flex;
     align-items: flex-end;
