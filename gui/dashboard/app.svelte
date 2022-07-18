@@ -133,12 +133,12 @@
       <div class="time">{time}</div>
       {#if pageCount > 1}
         <div>
-          {pageNum + 1}/{pageCount}
-        </div>
-        <div class="pagination">
-          {#each Array(pageCount).fill('') as _, i}
-            <em class:active={pageNum === i}></em>
-          {/each}
+          <span class="pagecount">{pageNum + 1}/{pageCount}</span>
+          <span class="pagination">
+            {#each Array(pageCount).fill('') as _, i}
+              <em class:active={pageNum === i}></em>
+            {/each}
+          </span>
         </div>
       {/if}
       <Settings />
@@ -195,6 +195,10 @@
     align-items: flex-end;
   }
 
+  .footer > .time {
+    width: 5em;
+  }
+
   .pagination em {
     display: inline-block;
     margin-left: 0.5rem;
@@ -203,9 +207,15 @@
     border-radius: 5px;
     background-color: #fff;
     opacity: 0.4;
+    vertical-align: middle;
   }
 
   .pagination em.active {
     opacity: 1;
+  }
+
+  .pagecount {
+    width: 2em;
+    display: inline-block;
   }
 </style>
