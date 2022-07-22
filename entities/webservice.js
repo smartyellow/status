@@ -34,6 +34,7 @@ module.exports = {
         { label: 'endpoints to test',
           sections: [
             'autotestInterval',
+            'testNow',
             'autotest',
           ],
         },
@@ -203,6 +204,19 @@ module.exports = {
               editor: 'number',
               label: 'minutes',
               labelPosition: 'right',
+            },
+          ],
+        },
+
+        testNow: {
+          label: 'test now',
+          fields: [
+            { key: 'id',
+              label: 'click to test this endpoint now',
+              editor: 'button',
+              method: 'post',
+              url: '/status/webservices/:id/testnow',
+              translate: true,
             },
           ],
         },

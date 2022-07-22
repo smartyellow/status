@@ -235,7 +235,7 @@ module.exports = {
     },
   ],
 
-  routes: ({ server }) => [
+  routes: ({ server, settings }) => [
 
     // Get all services
     { route: '/status/webservices',
@@ -283,6 +283,30 @@ module.exports = {
           isNew: false,
         });
         res.json(result);
+      },
+    },
+
+    { route: '/status/webservices/:id/testnow',
+      method: 'post',
+      requires: 'smartyellow/status/editServices',
+      handler: async (req, res, user) => {
+        const item = await server.storage({ user }).store('smartyellow/webservice').get(req.params[0]);
+        const runtime = fork(__dirname + '/lib/runtime.js');
+        runtime.send({ command: 'testOne', service: item });
+        runtime.on('message', async message => {
+          res.json(message);
+          if (message.error) {
+            server.error(message.error);
+          }
+          else if (message.outage) {
+            await processOutage({
+              outage: { [item.id]: message.outage },
+              onDateUpdated: () => server.publish('cms', 'smartyellow/status/reload'),
+              server,
+              settings,
+            });
+          }
+        });
       },
     },
 
