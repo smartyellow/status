@@ -3,7 +3,8 @@
   import TileRawValue from './tile-rawvalue.svelte';
   import Settings from './settings.svelte';
   import { flip } from 'svelte/animate';
-  import { settings, shuffle, ringBell } from './lib';
+  import { settings, shuffle } from './lib';
+  import { connect } from './apiclient';
 
   const [ send, receive ] = shuffle;
   let size = ($settings.cols || 4) * ($settings.rows || 3);
@@ -69,29 +70,14 @@
     tiles = servicesTemp;
   }
 
-  onMount(() => {
-    const ws = new WebSocket(
-      window.location.href.replace('http', 'ws') + '/socket'
-    );
-
-    ws.onmessage = async evt => {
-      const data = JSON.parse(evt.data || '""');
-
-      switch (data.cmd) {
-        case 'data':
-          globalData = data;
-          organiseGrid();
-          hasData = true;
-          break;
-
-        case 'bell':
-          ringBell();
-          break;
-
-        default:
-          break;
-      }
-    }
+  onMount(async () => {
+    await connect({
+      onData: data => {
+        globalData = data;
+        organiseGrid();
+        hasData = true;
+      },
+    });
 
     const clockInterval = setInterval(() => {
       time = new Date().toLocaleTimeString('en-GB', {
