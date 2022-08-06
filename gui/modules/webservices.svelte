@@ -219,7 +219,7 @@ function previewItem() {
 
     <PanelManager>
       <Panel>
-        <Form bind:data={item} prefix={$prefix} {api} {form} {readonly} {modified} {language} {translate} {errors} {debug} {notifications} on:save={saveChanges} />
+        <Form bind:data={item} prefix={$prefix} {api} {form} {readonly} {modified} {language} {translate} {errors} {debug} {notifications} on:save={saveChanges} on:openitem />
       </Panel>
       {#if preview}
         <Panel width="50%">
