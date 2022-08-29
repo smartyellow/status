@@ -14,13 +14,13 @@
   }) : '';
 
   onMount(() => {
-    if (since) {
-      function updateDuration() {
-        formattedDuration = formatDuration(
-          new Date().getTime() - since.getTime()
-        );
-      }
+    function updateDuration() {
+      formattedDuration = formatDuration(
+        new Date().getTime() - since.getTime()
+      );
+    }
 
+    if (since) {
       updateDuration();
       const interval = setInterval(updateDuration, 100);
       return () => clearInterval(interval);

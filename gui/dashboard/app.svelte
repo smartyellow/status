@@ -17,7 +17,7 @@
   let hasData = false;
 
   function tileProps(service) {
-    let props = {
+    const props = {
       title: service.name.en,
       subtitle: service.cluster,
       date: service.lastBeat?.date ? new Date(service.lastBeat.date) : undefined,
@@ -87,7 +87,9 @@
 
     settings.subscribe(s => {
       size = (s.cols || 4) * (s.rows || 3);
-      if (hasData) organiseGrid();
+      if (hasData) {
+        organiseGrid();
+      }
     });
 
     return () => clearInterval(clockInterval);

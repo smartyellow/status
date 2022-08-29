@@ -21,7 +21,7 @@ const defaultEndpoint = {
     { type: 'httpstatus',
       truth: 'true',
       operator: 'equal',
-      string: '200'
+      string: '200',
     },
   ],
 };
@@ -29,7 +29,7 @@ const defaultReq = {
   type: 'httpstatus',
   truth: 'true',
   operator: 'equal',
-  string: ''
+  string: '',
 };
 const defaultHeader = {
   name: '',
@@ -110,6 +110,7 @@ function removeEndpoint(i) {
                   />
                   <button on:click={() => {
                     endpoint.headers.splice(iHeader, 1);
+                    // eslint-disable-next-line no-self-assign
                     endpoint = endpoint;
                   }}>
                     &times;
@@ -123,7 +124,7 @@ function removeEndpoint(i) {
     {/if}
 
     <div>
-      <button on:click={() => endpoint.headers = [...endpoint.headers, defaultHeader]}>
+      <button on:click={() => endpoint.headers = [ ...endpoint.headers, defaultHeader ]}>
         {translate('add request header', language)}
       </button>
     </div>
@@ -161,7 +162,7 @@ function removeEndpoint(i) {
                   inline
                   labels={{
                     on: translate('is', language),
-                    off: translate('isn\'t', language)
+                    off: translate('isn\'t', language),
                   }}
                   bind:value={req.truth}
                   on:change={changeValue}
@@ -196,6 +197,7 @@ function removeEndpoint(i) {
                   />
                   <button on:click={() => {
                     endpoint.requirements.splice(iReq, 1);
+                    // eslint-disable-next-line no-self-assign
                     endpoint = endpoint;
                   }}>
                     &times;
@@ -209,7 +211,7 @@ function removeEndpoint(i) {
     {/if}
 
     <div>
-      <button on:click={() => endpoint.requirements = [...endpoint.requirements, defaultReq]}>
+      <button on:click={() => endpoint.requirements = [ ...endpoint.requirements, defaultReq ]}>
         {translate('add requirement', language)}
       </button>
     </div>

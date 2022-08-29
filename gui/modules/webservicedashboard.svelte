@@ -5,7 +5,9 @@
 
   onMount(() => {
     let url = window.location.href;
-    if (!url.endsWith('/')) url += '/';
+    if (!url.endsWith('/')) {
+      url += '/';
+    }
     url += 'status/dashboard';
 
     window.open(url, '_blank').focus();

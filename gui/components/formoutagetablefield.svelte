@@ -28,7 +28,7 @@ const severity = {
     name: 'no impact',
     class: 'l4',
   },
-}
+};
 const dispatch = createEventDispatcher();
 const service = value; // for clarity
 let outages = [];
