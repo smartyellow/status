@@ -268,9 +268,4 @@ function previewItem() {
 
 {/if}
 
-<style>
-  :global(.panel>iframe) {
-    height: 100%;
-    border: 0;
-  }
-</style>
+
