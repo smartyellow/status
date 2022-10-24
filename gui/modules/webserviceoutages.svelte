@@ -84,7 +84,7 @@ onMount(async function () {
         }
         api.subscribe(pluginName + '/reload', async msg => {
           if (msg.id == item.id) {
-            ({ item, form, log } = await api.get('/status/outages' + id));
+            ({ item, form, log } = await api.get('/status/outages/' + id));
           }
         });
         api.subscribe(entity + '/reload', async () => {
