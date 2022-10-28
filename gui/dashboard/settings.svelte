@@ -43,6 +43,11 @@
   </label>
 
   <label>
+    Enable animations
+    <input type="checkbox" bind:checked={$settings.animate} />
+  </label>
+
+  <label>
     Columns
     <input type="number" bind:value={$settings.cols} width="10" />
   </label>

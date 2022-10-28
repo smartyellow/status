@@ -110,7 +110,7 @@
         <div
           in:receive={{ key: tile.id }}
           out:send={{ key: tile.id }}
-          animate:flip
+          animate:flip={{ duration: $settings.animate ? (d => Math.sqrt(d) * 120) : 0 }}
         >
           <TileRawValue {...tileProps(tile)} />
         </div>

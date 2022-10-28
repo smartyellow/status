@@ -8,6 +8,7 @@ function createSettingsStore() {
     cols: 4,
     rows: 3,
     fontSize: 1,
+    animate: true,
   };
 
   const s = writable(defaults);
@@ -47,7 +48,7 @@ export const shuffle = crossfade({
     const transform = style.transform === 'none' ? '' : style.transform;
 
     return {
-      duration: 300,
+      duration: get(settings).animate ? 300 : 0,
       easing: quintOut,
       css: t => `
         transform: ${transform} scale(${t});
