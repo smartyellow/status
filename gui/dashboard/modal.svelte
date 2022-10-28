@@ -7,7 +7,15 @@
   function close() {
     open = false;
   }
+
+  function keyup(event) {
+    if (event.key === 'Escape') {
+      close();
+    }
+  }
 </script>
+
+<svelte:window on:keyup={keyup} />
 
 <div class="modal-bg theme-{$settings.theme}" class:open>
   <div class="modal">
