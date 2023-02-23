@@ -4,9 +4,11 @@
 
   let open = false;
   let showCopyCheck = false;
+  let copyButton;
 
-  function toggle() {
-    open = !open;
+  function openModal() {
+    open = true;
+    copyButton?.focus();
   }
 
   function copy() {
@@ -16,15 +18,24 @@
       setTimeout(() => showCopyCheck = false, 2000);
     }
   }
+
+  function keydown(event) {
+    if ((event.key === ',') && (event.metaKey || event.ctrlKey)) {
+      event.preventDefault();
+      openModal();
+    }
+  }
 </script>
 
-<button class="settings" on:click={toggle}>
+<svelte:window on:keydown={keydown} />
+
+<button class="settings" on:click={openModal}>
   Settings
 </button>
 
 <Modal title="Settings" bind:open>
   <div class="mb">
-    <button on:click={copy} class="btn copy">
+    <button on:click={copy} class="btn copy" bind:this={copyButton}>
       Copy settings to clipboard
       {#if showCopyCheck}
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 405.27 405.27">

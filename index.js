@@ -803,7 +803,9 @@ module.exports = {
     { route: '/status/dashboard',
       method: 'get',
       handler: async (req, res) => {
-        if (!renderedDashboard) {
+        // const cacheValid = !!renderedDashboard;
+        const cacheValid = true;
+        if (!cacheValid) {
           // Build dashboard
           let cssOutput = '';
 
@@ -811,17 +813,9 @@ module.exports = {
             const bundle = await buildDeps.rollup({
               input: __dirname + '/gui/dashboard/index.js',
               plugins: [
-                buildDeps.svelte({
-                  compilerOptions: {
-                    dev: false,
-                    generate: 'dom',
-                  },
-                }),
+                buildDeps.svelte({ compilerOptions: { dev: false, generate: 'dom' } }),
                 buildDeps.css({ output: style => cssOutput = style }),
-                buildDeps.resolve({
-                  browser: true,
-                  dedupe: [ 'svelte' ],
-                }),
+                buildDeps.resolve({ browser: true, dedupe: [ 'svelte' ] }),
                 buildDeps.commonjs(),
                 buildDeps.terser(),
               ],
