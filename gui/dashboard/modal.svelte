@@ -4,24 +4,21 @@
   export let title = '';
   export let open = false;
 
-  function close() {
-    open = false;
-  }
-
-  function keyup(event) {
+  function keydown(event) {
     if (event.key === 'Escape') {
-      close();
+      event.preventDefault();
+      open = false;
     }
   }
 </script>
 
-<svelte:window on:keyup={keyup} />
+<svelte:window on:keydown={keydown} />
 
 <div class="modal-bg theme-{$settings.theme}" class:open>
   <div class="modal">
     <div class="header">
       <div class="title">{title}</div>
-      <button class="close" on:click={close}>&times;</button>
+      <button class="close" on:click={() => open = false}>&times;</button>
     </div>
 
     <div class="body">
@@ -38,7 +35,6 @@
     right: 0;
     bottom: 0;
     padding-top: 3rem;
-    background-color: rgba(0, 0, 0, 0.4);
     align-items: center;
     justify-content: center;
     display: none;

@@ -3,8 +3,8 @@ html, body {
   --body-fg: #fff;
   --tile-bg: #181818;
   --grey: grey;
-  --red: red;
-  --green: green;
+  --red: #f00;
+  --green: #1d641d;
   --dark: #0a0a0a;
   --radius: 10px;
   --cols: 4;
@@ -17,10 +17,11 @@ html, body {
 }
 
 .theme-light {
-  --body-bg: #fff;
+  --body-bg: #d6d6d6;
   --body-fg: #000;
   --tile-bg: #dedede;
   --dark: #c2c2c2;
+  --green: #377137;
 }
 
 .mb {
