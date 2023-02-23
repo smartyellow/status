@@ -2,7 +2,7 @@ import { get, writable } from 'svelte/store';
 import { quintOut } from 'svelte/easing';
 import { crossfade } from 'svelte/transition';
 
-function createSettingsStore() {
+export const settings = (() => {
   const defaults = {
     theme: 'dark',
     cols: 4,
@@ -14,10 +14,7 @@ function createSettingsStore() {
   const s = writable(defaults);
 
   function updateStorage(val) {
-    window.localStorage.setItem('statusdash', JSON.stringify({
-      ...defaults,
-      ...val,
-    }));
+    window.localStorage.setItem('statusdash', JSON.stringify({ ...defaults, ...val }));
     s.set(val);
   }
 
@@ -25,7 +22,7 @@ function createSettingsStore() {
   let localStorage = {};
 
   try {
-    localStorage = JSON.parse(localStorageString);
+    localStorage = JSON.parse(localStorageString || '{}');
   }
   catch {
     localStorage = {};
@@ -35,12 +32,10 @@ function createSettingsStore() {
 
   return {
     subscribe: s.subscribe,
-    set: val => updateStorage(val),
+    set: val => updateStorage(val || {}),
     update: val => updateStorage({ ...get(s), ...val }),
   };
-}
-
-export const settings = createSettingsStore();
+})();
 
 export const shuffle = crossfade({
   fallback(node) {
