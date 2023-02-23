@@ -5,7 +5,7 @@ html, body {
   --grey: grey;
   --red: #f00;
   --green: #1d641d;
-  --orange: #bf5900;
+  --orange: #bfa200;
   --dark: #0a0a0a;
   --radius: 10px;
   --cols: 4;
@@ -23,7 +23,6 @@ html, body {
   --tile-bg: #dedede;
   --dark: #c2c2c2;
   --green: #377137;
-  --orange: #bf5900;
 }
 
 .mb {
