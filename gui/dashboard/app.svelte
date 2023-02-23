@@ -1,92 +1,114 @@
 <script>
   import { onMount } from 'svelte';
-  import TileRawValue from './tile-rawvalue.svelte';
+  import Tile from './tile.svelte';
   import Settings from './settings.svelte';
   import { flip } from 'svelte/animate';
   import { settings, shuffle } from './lib';
   import { connect } from './apiclient';
 
   const [ send, receive ] = shuffle;
-  let size = ($settings.cols || 4) * ($settings.rows || 3);
-  let placesLeft = size;
+  let maxNumberOfTilesOnPage = ($settings.cols || 4) * ($settings.rows || 3);
   let pageNum = -1;
   let pageCount = 1;
-  let tiles = [];
+  let allTiles = [];
+  let tilesOnPage = [];
   let time = '';
-  let globalData = {};
   let hasData = false;
 
-  function tileProps(service) {
-    const props = {
-      title: service.name.en,
-      subtitle: service.cluster,
-      date: service.lastBeat?.date ? new Date(service.lastBeat.date) : undefined,
-      since: service.checked ? new Date(service.checked) : undefined,
-    };
-
-    if (!service.lastBeat?.date) {
-      props.value = 'no data';
-      props.color = 'grey';
-      props.sort = 20;
+  function previousPage() {
+    pageNum--;
+    if (pageNum < 0) {
+      pageNum = pageCount - 1;
     }
-    else if (service.lastBeat.down) {
-      props.value = 'down';
-      props.color = 'red';
-      props.sort = 0;
-    }
-    else {
-      props.value = 'up';
-      props.color = 'green';
-      props.sort = 10;
-    }
-
-    return props;
   }
 
-  function organiseGrid() {
-    let servicesTemp = [];
-    const { servicesUp, servicesDown, servicesUnknown, total } = globalData;
-    const upOrUnknown = [ ...servicesUp, ...servicesUnknown ];
-    servicesTemp = servicesDown.slice(0, size);
-    pageCount = Math.ceil(upOrUnknown.length / size);
-    placesLeft = size - servicesTemp.length;
-    pageCount = Math.ceil(upOrUnknown.length / placesLeft);
+  function nextPage() {
+    pageNum++;
+    if (pageNum >= pageCount) {
+      pageNum = 0;
+    }
+  }
 
-    if (pageNum === -1 || total >= size) {
-      pageNum++;
+  function organiseGrid(goToNextPage = true) {
+    const newTiles = allTiles.sort((a, b) => b.prio - a.prio);
+    const pinnedTilesCount = allTiles.filter(t => t.prio > 0).length;
+    const placesLeft = maxNumberOfTilesOnPage - pinnedTilesCount;
+    pageCount = Math.ceil(newTiles.length / placesLeft);
 
-      if (pageNum >= pageCount) {
+    if (((newTiles.length >= placesLeft) && goToNextPage) || (pageNum === -1)) {
+      nextPage();
+    }
+
+    tilesOnPage = [
+      ...newTiles.slice(0, pinnedTilesCount),
+      ...newTiles.slice(pinnedTilesCount + (pageNum * placesLeft)),
+    ].slice(0, maxNumberOfTilesOnPage);
+  }
+
+  function keydown(event) {
+    switch (event.code) {
+      case 'ArrowLeft':
+      case 'PageUp':
+        event.preventDefault();
+        previousPage();
+        organiseGrid(false);
+        break;
+
+      case 'ArrowRight':
+      case 'PageDown':
+        event.preventDefault();
+        nextPage();
+        organiseGrid(false);
+        break;
+
+      case 'Home':
+        event.preventDefault();
         pageNum = 0;
-      }
-    }
+        organiseGrid(false);
+        break;
 
-    const offset = placesLeft * pageNum;
-    if (placesLeft > 0) {
-      servicesTemp.push(
-        ...upOrUnknown.slice(offset, placesLeft + offset)
-      );
-    }
+      case 'End':
+        event.preventDefault();
+        pageNum = pageCount - 1;
+        organiseGrid(false);
+        break;
 
-    tiles = servicesTemp;
+      default:
+        if (event.code.startsWith('Digit')) {
+          event.preventDefault();
+          let num = parseInt(event.code.slice(5));
+          if (!isNaN(num)) {
+            if (num > pageCount) {
+              num = pageCount;
+            }
+            pageNum = num - 1;
+            organiseGrid(false);
+          }
+        }
+        break;
+    }
   }
 
   onMount(async () => {
     await connect({
       onData: data => {
-        globalData = data;
+        allTiles = data.tiles?.map(tile => {
+          if (tile?.service?.checked) {
+            tile.service.checked = new Date(tile.service.checked);
+          }
+          return tile;
+        });
         organiseGrid();
         hasData = true;
       },
     });
 
     const clockInterval = setInterval(() => {
-      time = new Date().toLocaleTimeString('en-GB', {
-        timeStyle: 'medium',
-      });
+      time = new Date().toLocaleTimeString('en-GB', { timeStyle: 'medium' });
     }, 100);
 
     settings.subscribe(s => {
-      size = (s.cols || 4) * (s.rows || 3);
+      maxNumberOfTilesOnPage = (s.cols || 4) * (s.rows || 3);
       if (hasData) {
         organiseGrid();
       }
@@ -95,6 +117,8 @@
     return () => clearInterval(clockInterval);
   });
 </script>
+
+<svelte:window on:keydown={keydown} />
 
 <div
   class="center theme-{$settings.theme}"
@@ -106,13 +130,13 @@
 >
   <div class="ratio">
     <div class="tiles">
-      {#each tiles as tile (tile.id)}
+      {#each tilesOnPage || [] as tile (tile.serviceId)}
         <div
-          in:receive={{ key: tile.id }}
-          out:send={{ key: tile.id }}
+          in:receive={{ key: tile.serviceId }}
+          out:send={{ key: tile.serviceId }}
           animate:flip={{ duration: $settings.animate ? (d => Math.sqrt(d) * 120) : 0 }}
         >
-          <TileRawValue {...tileProps(tile)} />
+          <Tile {tile} />
         </div>
       {/each}
     </div>

@@ -375,32 +375,38 @@ module.exports = {
                 .sort({ date: -1 })
                 .toArray();
 
-              const servicesUp = [];
-              const servicesDown = [];
-              const servicesUnknown = [];
+              const tiles = [];
               downIdsAfter = [];
 
               for (let service of services) {
                 const beat = heartbeats.find(b => b.webservice === service.id);
                 service = mapService(service, beat);
+                const tile = {
+                  service: service,
+                  serviceId: service.id,
+                  badges: [],
+                  prio: -1,
+                };
 
                 if (!beat) {
-                  servicesUnknown.push(service);
+                  tile.prio = -1; // no data (grey)
+                  tile.statusText = 'no data';
                 }
                 else if (beat.down) {
-                  servicesDown.push(service);
-                  downIdsAfter.push(service.id);
+                  tile.prio = 2; // down (red)
+                  tile.statusText = 'down';
+                  downIdsAfter.push(tile.serviceId);
                 }
                 else {
-                  servicesUp.push(service);
+                  tile.prio = 0; // ok (green)
+                  tile.statusText = 'ok';
                 }
+
+                tiles.push(tile);
               }
 
-              const total = [
-                ...servicesUp,
-                ...servicesDown,
-                ...servicesUnknown,
-              ].length;
+              // Let other plugins enrich dashboard tiles with custom badges and priorities.
+              await server.executePostHooks('pupulateDashboardTiles', { tiles });
 
               let newOutage = false;
               for (const id of downIdsAfter) {
@@ -408,20 +414,14 @@ module.exports = {
                   newOutage = true;
                 }
               }
-              downIdsBefore = JSON.parse(JSON.stringify(downIdsAfter));
+              downIdsBefore = [ ...downIdsAfter ];
 
               try {
                 if (newOutage) {
                   ws.send(JSON.stringify({ cmd: 'bell' }));
                 }
 
-                ws.send(JSON.stringify({
-                  cmd: 'data',
-                  servicesUp,
-                  servicesDown,
-                  servicesUnknown,
-                  total,
-                }));
+                ws.send(JSON.stringify({ cmd: 'data', tiles: tiles }));
               }
               catch {
                 return;
@@ -804,7 +804,7 @@ module.exports = {
       method: 'get',
       handler: async (req, res) => {
         // const cacheValid = !!renderedDashboard;
-        const cacheValid = true;
+        const cacheValid = false;
         if (!cacheValid) {
           // Build dashboard
           let cssOutput = '';
