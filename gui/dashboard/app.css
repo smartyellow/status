@@ -3,9 +3,9 @@ html, body {
   --body-fg: #fff;
   --tile-bg: #181818;
   --grey: grey;
-  --red: #f00;
-  --green: #1d641d;
-  --orange: #d5d33d;
+  --red: #ff2d2d;
+  --green: #0f4e0f;
+  --orange: #d4b22e;
   --dark: #0a0a0a;
   --radius: 10px;
   --cols: 4;
@@ -22,7 +22,6 @@ html, body {
   --body-fg: #000;
   --tile-bg: #dedede;
   --dark: #c2c2c2;
-  --green: #377137;
 }
 
 .mb {
