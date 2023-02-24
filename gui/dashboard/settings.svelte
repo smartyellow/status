@@ -1,6 +1,6 @@
 <script>
   import Modal from './modal.svelte';
-  import { settings } from './lib';
+  import { ringBell, settings } from './lib';
 
   let open = false;
   let showCopyCheck = false;
@@ -42,6 +42,9 @@
           <path d="M393.4 124.42 179.6 338.21a40.57 40.57 0 0 1-57.36 0L11.88 227.84a40.56 40.56 0 0 1 57.35-57.37l81.7 81.7 185.1-185.1a40.57 40.57 0 0 1 57.37 57.36z"/>
         </svg>
       {/if}
+    </button>
+    <button on:click={ringBell} class="btn">
+      Test bell
     </button>
   </div>
 
@@ -87,9 +90,9 @@
   }
 
   button.copy svg {
-    fill: var(--green);
+    fill: currentColor;
     height: 1rem;
     width: 1rem;
-    margin-left: 1rem;
+    margin-left: 0.5rem;
   }
 </style>

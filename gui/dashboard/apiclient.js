@@ -1,5 +1,3 @@
-import { ringBell } from './lib';
-
 const socketUrl = window.location.href.replace('http', 'ws') + '/socket';
 let reconnectAttempts = 0;
 let ws;
@@ -8,20 +6,8 @@ export async function connect({ onData }) {
   ws = new WebSocket(socketUrl);
 
   ws.onmessage = async evt => {
-    const data = JSON.parse(evt.data || 'false');
-
-    switch (data.cmd) {
-      case 'data':
-        onData(data);
-        break;
-
-      case 'bell':
-        ringBell();
-        break;
-
-      default:
-        break;
-    }
+    const data = JSON.parse(evt.data || '{}');
+    onData(data);
   };
 
   ws.onopen = () => {
@@ -36,5 +22,5 @@ export async function connect({ onData }) {
     await connect({ onData });
   };
 
-  ws.onerror = err => console.error('Connection error', err);
+  ws.onerror = err => console.error('Connection error:', err);
 }

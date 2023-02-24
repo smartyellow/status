@@ -3,7 +3,7 @@
   import Tile from './tile.svelte';
   import Settings from './settings.svelte';
   import { flip } from 'svelte/animate';
-  import { settings, shuffle } from './lib';
+  import { ringBell, settings, shuffle } from './lib';
   import { connect } from './apiclient';
 
   const [ send, receive ] = shuffle;
@@ -91,13 +91,18 @@
 
   onMount(async () => {
     await connect({
-      onData: data => {
-        allTiles = data.tiles?.map(tile => {
+      onData: ({ tiles, newOutage }) => {
+        allTiles = tiles?.map(tile => {
           if (tile?.service?.checked) {
             tile.service.checked = new Date(tile.service.checked);
           }
           return tile;
         });
+
+        if (newOutage) {
+          ringBell();
+        }
+
         organiseGrid();
         hasData = true;
       },

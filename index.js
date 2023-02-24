@@ -349,9 +349,9 @@ module.exports = {
       order: 100,
       purpose: 'Start the websocket for the dashboard after boot',
       handler: () => {
-        const decoder = new TextDecoder('utf-8');
         let downIdsBefore = [];
         let downIdsAfter = [];
+        let newOutage = false;
 
         const mapService = (s, beat) => ({
           id: s.id,
@@ -374,9 +374,7 @@ module.exports = {
                 .find({ webservice: { $in: services.map(s => s.id) } })
                 .sort({ date: -1 })
                 .toArray();
-
               const tiles = [];
-              downIdsAfter = [];
 
               for (let service of services) {
                 const beat = heartbeats.find(b => b.webservice === service.id);
@@ -408,46 +406,31 @@ module.exports = {
               // Let other plugins enrich dashboard tiles with custom badges and priorities.
               await server.executePostHooks('pupulateDashboardTiles', { tiles });
 
-              let newOutage = false;
+              // Check if there are new outages and report them by ringing a bell on the dashboard.
+              newOutage = false;
               for (const id of downIdsAfter) {
                 if (!downIdsBefore.includes(id)) {
                   newOutage = true;
                 }
               }
               downIdsBefore = [ ...downIdsAfter ];
+              downIdsAfter = [];
 
               try {
-                if (newOutage) {
-                  ws.send(JSON.stringify({ cmd: 'bell' }));
-                }
-
-                ws.send(JSON.stringify({ cmd: 'data', tiles: tiles }));
+                const json = JSON.stringify({ newOutage, tiles });
+                ws.send(json);
               }
               catch {
                 return;
               }
             }
 
+            // Send statuses on open and every 5 seconds.
             sendStatuses();
             setInterval(sendStatuses, 5000);
           },
           onUpgrade: async () => ({ id: makeId(10) }),
-          onMessage: async (ws, msg) => {
-            msg = JSON.parse(decoder.decode(msg));
-
-            if (!msg || !msg.command) {
-              return;
-            }
-
-            switch (msg.command) {
-              case 'data':
-                ws.send('data');
-                return;
-
-              default:
-                return;
-            }
-          },
+          onMessage: async () => { /* do nothing */ },
         });
       },
     },
