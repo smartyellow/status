@@ -19,6 +19,7 @@ const icons = {
   external: '<path fill-rule="evenodd" d="M240 96a48 48 0 0 1 0 96h-48v384h384v-48a48 48 0 1 1 96 0v48a96 96 0 0 1-96 96H192a96 96 0 0 1-96-96V192a96 96 0 0 1 96-96Zm480-48v239.91a48 48 0 1 1-96 0v-76.03L418.36 417.53a48 48 0 1 1-67.89-67.89L556.12 144h-76.3a48 48 0 0 1 0-96Zm0 0"/>',
 };
 
+const servicesNotifiedAboutOutage = new Set();
 let renderedDashboard = null;
 
 async function processOutage({ outage, server, settings, onDateUpdated }) {
@@ -70,64 +71,6 @@ async function processOutage({ outage, server, settings, onDateUpdated }) {
         catch (err) {
           server.error('status: could not save web service heartbeat');
           server.error(err);
-        }
-
-        // Send e-mail notification
-        if (server.sendEmail && settings.emailSender && settings.emailRecipient) {
-          try {
-            const date = new Date().toLocaleString('en-GB', {
-              dateStyle: 'full',
-              timeStyle: 'full',
-              timeZone: 'Etc/UTC',
-            });
-
-            await server.sendEmail({
-              sender: settings.emailSender,
-              to: settings.emailRecipient,
-              subject: `[outage] ${service.name} is down`,
-              body: `Hello,
-
-As of ${date} UTC time, the service "${service.name}" does not meet the requirements for being
-considered as working.
-
-Technical information containing the reason for this alert:
-${JSON.stringify(testResult, null, 2)}
-
-Please always check this before taking action. This is an automated message.`,
-            });
-          }
-          catch (err) {
-            server.warn('status: could not send endpoint status notification e-mail');
-            server.warn(err);
-          }
-        }
-
-        // Draft outage entry
-        if (settings.draftOutageEntries) {
-          try {
-            server
-              .storage
-              .store('smartyellow/webserviceoutage')
-              .insert({
-                id: makeId(),
-                name: {
-                  en: `[automatic] Outage for ${service.name.en}`,
-                },
-                state: 'concept',
-                resolved: false,
-                services: [ service.id ],
-                tags: [ 'automatically created' ],
-                notes: [ {
-                  date: new Date(),
-                  userId: 'system',
-                  text: `Automatically created outage. Reason: ${JSON.stringify(testResult, null, 2)}`,
-                } ],
-              });
-          }
-          catch (err) {
-            server.warn('status: could not automatically draft outage entry');
-            server.warn(err);
-          }
         }
       }
     }
@@ -244,16 +187,22 @@ module.exports = {
       description: 'Tags that can be assigned to outage messages to categorise them.',
       default: {},
     },
-    emailSender: {
-      type: 'string',
-      label: 'notification sender',
-      description: 'Sender of notifications about service statuses. Format: Name <email@example.com>',
-      default: '',
-    },
-    emailRecipient: {
+    // emailSender: {
+    //   type: 'string',
+    //   label: 'notification sender',
+    //   description: 'Sender of notifications about service statuses. Format: Name <email@example.com>',
+    //   default: '',
+    // },
+    // emailRecipient: {
+    //   type: 'array',
+    //   label: 'notification recipients',
+    //   description: 'Recipients of notifications about service statuses. Format: Name <email@example.com>',
+    //   default: [],
+    // },
+    smsRecipients: {
       type: 'array',
-      label: 'notification recipients',
-      description: 'Recipients of notifications about service statuses. Format: Name <email@example.com>',
+      label: 'SMS recipients',
+      description: 'Recipients of SMSes about service statuses.',
       default: [],
     },
     draftOutageEntries: {
@@ -404,7 +353,9 @@ module.exports = {
               }
 
               // Let other plugins enrich dashboard tiles with custom badges and priorities.
-              await server.executePostHooks('pupulateDashboardTiles', { tiles });
+              await server.executePreHooks('populateDashboardTiles', { tiles });
+              await server.executePostHooks('populateDashboardTiles', { tiles });
+              await server.executePostHooks('pupulateDashboardTiles', { tiles }); // backwards compatibility
 
               // Check if there are new outages and report them by ringing a bell on the dashboard.
               newOutage = false;
@@ -458,6 +409,51 @@ module.exports = {
             });
           }
         });
+      },
+    },
+
+    { id: 'sendSmsOnOutage',
+      order: 10,
+      event: 'populateDashboardTiles',
+      purpose: 'Sends an SMS when a tile with priority of 2 or higher is rendered',
+      handler: async ({ tiles }) => {
+        if ((typeof server.sendSMS !== 'function') || (settings.smsRecipients?.length < 1)) {
+          // sendSMS not available, or no recipients.
+          return;
+        }
+
+        const servicesToNotifyAbout = new Set();
+
+        for (const tile of tiles) {
+          if (tile.prio < 2) {
+            // Tile is not of priority 2 or higher. Remove its ID from servicesNotifiedAboutOutage.
+            servicesNotifiedAboutOutage.delete(tile.serviceId);
+          }
+          else {
+            // Tile is of high priority.
+            if (servicesNotifiedAboutOutage.has(tile.serviceId)) {
+              // Already notified about: do nothing.
+            }
+            else {
+              // Not yet notified about: send SMSes.
+              servicesNotifiedAboutOutage.add(tile.serviceId);
+              servicesToNotifyAbout.add(tile.service?.name?.en || tile.serviceId);
+            }
+          }
+        }
+
+        if (servicesToNotifyAbout.size > 0) {
+          // There are new critical tiles; send notification.
+          const string = [ ...servicesToNotifyAbout ].join(', ');
+          server.debug('Sending status SMSes for the following services: ', string);
+          settings.smsRecipients.forEach(phoneNumber => server.sendSMS({
+            to: phoneNumber,
+            msg: 'The following service/s is/are experiencing outage: ' + string,
+          }).catch(err => {
+            server.error('Failed to send status SMS');
+            server.error(err);
+          }));
+        }
       },
     },
   ],
