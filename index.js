@@ -472,7 +472,7 @@ module.exports = {
 
         if (tilesToNotifyAbout.size > 0) {
           server.debug('Sending status e-mails for the following services: ', [ ...tilesToNotifyAbout ].map(t => t.serviceId).join(', '));
-          const message = '<p>The following tiles are updated to have priority 1 or higher:</p><ul>'
+          const message = '<p>The following web services are updated to have priority 1 or higher:</p><ul>'
             + [ ...tilesToNotifyAbout ].map(tile => {
               let text = `<li><p>${tile.service.name?.en || tile.serviceId}: ${tile.statusText}`;
               if (tile.badges?.length > 0) {
@@ -484,7 +484,7 @@ module.exports = {
             + '</ul>';
 
           settings.emailRecipients.forEach(address => server.sendEmail({
-            subject: `[alert] ${tilesToNotifyAbout.size} new tile${tilesToNotifyAbout.size === 1 ? '' : 's'}!`,
+            subject: `[alert] ${tilesToNotifyAbout.size} web service${tilesToNotifyAbout.size === 1 ? '' : 's'} have a high priority!`,
             sender: settings.emailSender,
             to: address,
             body: message,
