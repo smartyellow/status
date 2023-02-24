@@ -22,7 +22,7 @@ const icons = {
 const servicesNotifiedAboutOutage = new Set();
 let renderedDashboard = null;
 
-async function processOutage({ outage, server, onDateUpdated }) {
+async function processOutage({ outage, server, settings, onDateUpdated }) {
   if (typeof onDateUpdated !== 'function') {
     onDateUpdated = () => null;
   }
@@ -33,6 +33,12 @@ async function processOutage({ outage, server, onDateUpdated }) {
       { id },
       { $set: { lastChecked: new Date() } }
     ).then(() => onDateUpdated(id));
+
+    // Get service entry
+    const service = await server
+      .storage
+      .store('smartyellow/webservice')
+      .findOne({ id });
 
     // Get last heartbeat
     const heartbeat = await server
@@ -65,6 +71,34 @@ async function processOutage({ outage, server, onDateUpdated }) {
         catch (err) {
           server.error('status: could not save web service heartbeat');
           server.error(err);
+        }
+
+        // Draft outage entry
+        if (settings.draftOutageEntries) {
+          try {
+            server
+              .storage
+              .store('smartyellow/webserviceoutage')
+              .insert({
+                id: makeId(),
+                name: {
+                  en: `[automatic] Outage for ${service.name.en}`,
+                },
+                state: 'concept',
+                resolved: false,
+                services: [ service.id ],
+                tags: [ 'automatically created' ],
+                notes: [ {
+                  date: new Date(),
+                  userId: 'system',
+                  text: `Automatically created outage. Reason: ${JSON.stringify(testResult, null, 2)}`,
+                } ],
+              });
+          }
+          catch (err) {
+            server.warn('status: could not automatically draft outage entry');
+            server.warn(err);
+          }
         }
       }
     }
