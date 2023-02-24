@@ -22,7 +22,7 @@ const icons = {
 const servicesNotifiedAboutOutage = new Set();
 let renderedDashboard = null;
 
-async function processOutage({ outage, server, settings, onDateUpdated }) {
+async function processOutage({ outage, server, onDateUpdated }) {
   if (typeof onDateUpdated !== 'function') {
     onDateUpdated = () => null;
   }
@@ -33,12 +33,6 @@ async function processOutage({ outage, server, settings, onDateUpdated }) {
       { id },
       { $set: { lastChecked: new Date() } }
     ).then(() => onDateUpdated(id));
-
-    // Get service entry
-    const service = await server
-      .storage
-      .store('smartyellow/webservice')
-      .findOne({ id });
 
     // Get last heartbeat
     const heartbeat = await server
@@ -187,18 +181,18 @@ module.exports = {
       description: 'Tags that can be assigned to outage messages to categorise them.',
       default: {},
     },
-    // emailSender: {
-    //   type: 'string',
-    //   label: 'notification sender',
-    //   description: 'Sender of notifications about service statuses. Format: Name <email@example.com>',
-    //   default: '',
-    // },
-    // emailRecipient: {
-    //   type: 'array',
-    //   label: 'notification recipients',
-    //   description: 'Recipients of notifications about service statuses. Format: Name <email@example.com>',
-    //   default: [],
-    // },
+    emailSender: {
+      type: 'string',
+      label: 'notification sender',
+      description: 'Sender of notifications about service statuses. Format: Name <email@example.com>',
+      default: '',
+    },
+    emailRecipients: {
+      type: 'array',
+      label: 'e-mail recipients',
+      description: 'Recipients of e-mail notifications about service statuses. Format: Name <email@example.com>',
+      default: [],
+    },
     smsRecipients: {
       type: 'array',
       label: 'SMS recipients',
@@ -412,6 +406,62 @@ module.exports = {
       },
     },
 
+    { id: 'sendEmailOnOutage',
+      order: 10,
+      event: 'populateDashboardTiles',
+      purpose: 'Sends an e-mail when a tile with priority of 1 or higher is rendered',
+      handler: async ({ tiles }) => {
+        if ((typeof server.sendEmail !== 'function') || (typeof settings.emailSender !== 'string') || !settings.emailRecipients?.length) {
+          // Bad configuration or no email extension.
+          return;
+        }
+
+        const tilesToNotifyAbout = new Set();
+
+        for (const tile of tiles) {
+          if (tile.prio < 1) {
+            // Tile is not of priority 1 or higher. Remove its ID from servicesNotifiedAboutOutage.
+            servicesNotifiedAboutOutage.delete(tile.serviceId);
+          }
+          else {
+            // Tile is of sufficient priority.
+            if (servicesNotifiedAboutOutage.has(tile.serviceId)) {
+              // Already notified about: do nothing.
+            }
+            else {
+              // Not yet notified about: send email.
+              servicesNotifiedAboutOutage.add(tile.serviceId);
+              tilesToNotifyAbout.add(tile);
+            }
+          }
+        }
+
+        if (tilesToNotifyAbout.size > 0) {
+          server.debug('Sending status e-mails for the following services: ', [ ...tilesToNotifyAbout ].map(t => t.serviceId).join(', '));
+          const message = '<p>The following tiles are updated to have priority 1 or higher:</p><ul>'
+            + [ ...tilesToNotifyAbout ].map(tile => {
+              let text = `<li><p>${tile.service.name?.en || tile.serviceId}: ${tile.statusText}`;
+              if (tile.badges?.length > 0) {
+                text += ' (' + tile.badges.map(String).join(', ') + ')';
+              }
+              text += '.</p></li>';
+              return text;
+            }).join('')
+            + '</ul>';
+
+          settings.emailRecipients.forEach(address => server.sendEmail({
+            subject: `[alert] ${tilesToNotifyAbout.size} new tile${tilesToNotifyAbout.size === 1 ? '' : 's'}!`,
+            sender: settings.emailSender,
+            to: address,
+            body: message,
+          }).catch(err => {
+            server.error('status: failed to send e-mail');
+            server.error(err);
+          }));
+        }
+      },
+    },
+
     { id: 'sendSmsOnOutage',
       order: 10,
       event: 'populateDashboardTiles',
@@ -450,7 +500,7 @@ module.exports = {
             to: phoneNumber,
             msg: 'The following service/s is/are experiencing outage: ' + string,
           }).catch(err => {
-            server.error('Failed to send status SMS');
+            server.error('status: failed to send SMS');
             server.error(err);
           }));
         }
