@@ -1,8 +1,8 @@
 'use strict';
 
 const fetch = require('node-fetch');
-const { operators } = require('./operators');
-const { realValues } = require('./realvalues');
+const { operators } = require('./lib/operators');
+const { realValues } = require('./lib/realvalues');
 const http = require('http');
 const https = require('https');
 

@@ -327,7 +327,7 @@ module.exports = {
           return;
         }
 
-        const runtime = fork(__dirname + '/lib/runtime.js');
+        const runtime = fork(__dirname + '/runtime.js');
         runtime.send({ command: 'testAll', services });
 
         runtime.on('message', message => {
@@ -458,7 +458,7 @@ module.exports = {
       entity: [ 'smartyellow/webservice' ],
       purpose: 'Check whether services are up and send a notification if not.',
       handler: ({ item }) => {
-        const runtime = fork(__dirname + '/lib/runtime.js');
+        const runtime = fork(__dirname + '/runtime.js');
         runtime.send({ command: 'testOne', service: item });
         runtime.on('message', message => {
           if (message.error) {
@@ -535,7 +535,7 @@ module.exports = {
       requires: 'smartyellow/status/editServices',
       handler: async (req, res, user) => {
         const item = await server.storage({ user }).store('smartyellow/webservice').get(req.params[0]);
-        const runtime = fork(__dirname + '/lib/runtime.js');
+        const runtime = fork(__dirname + '/runtime.js');
         runtime.send({ command: 'testOne', service: item });
         runtime.on('message', async message => {
           res.json(message);
