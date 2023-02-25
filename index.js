@@ -326,90 +326,101 @@ module.exports = {
       order: 100,
       purpose: 'Start the websocket for the dashboard after boot',
       handler: () => {
+        const timers = {};
+        let tiles = [];
         let downIdsBefore = [];
         let downIdsAfter = [];
         let newOutage = false;
 
-        const mapService = (s, beat) => ({
-          id: s.id,
-          name: s.name,
-          cluster: s.cluster,
-          lastBeat: beat,
-          checked: s.lastChecked,
-        });
+        function mapService(s, beat) {
+          return {
+            id: s.id,
+            name: s.name,
+            cluster: s.cluster,
+            lastBeat: beat,
+            checked: s.lastChecked,
+          };
+        }
+
+        async function getTiles() {
+          const services = await server.storage
+            .store('smartyellow/webservice')
+            .find({ public: true })
+            .toArray();
+          const heartbeats = await server.storage
+            .store('smartyellow/webserviceheartbeat')
+            .find({ webservice: { $in: services.map(s => s.id) } })
+            .sort({ date: -1 })
+            .toArray();
+          tiles = [];
+
+          for (let service of services) {
+            const beat = heartbeats.find(b => b.webservice === service.id);
+            service = mapService(service, beat);
+            const tile = {
+              service: service,
+              serviceId: service.id,
+              badges: [],
+              prio: -1,
+            };
+
+            if (!beat) {
+              tile.prio = -1; // no data (grey)
+              tile.statusText = 'no data';
+            }
+            else if (beat.down) {
+              tile.prio = 2; // down (red)
+              tile.statusText = 'down';
+              downIdsAfter.push(tile.serviceId);
+            }
+            else {
+              tile.prio = 0; // ok (green)
+              tile.statusText = 'ok';
+            }
+
+            tiles.push(tile);
+          }
+
+          // Let other plugins enrich dashboard tiles with custom badges and priorities.
+          await server.executePreHooks('populateDashboardTiles', { tiles });
+          await server.executePostHooks('populateDashboardTiles', { tiles });
+          await server.executePostHooks('pupulateDashboardTiles', { tiles }); // backwards compatibility
+
+          // Check if there are new outages and report them by ringing a bell on the dashboard.
+          newOutage = false;
+          for (const id of downIdsAfter) {
+            if (!downIdsBefore.includes(id)) {
+              newOutage = true;
+            }
+          }
+          downIdsBefore = [ ...downIdsAfter ];
+          downIdsAfter = [];
+        }
+
+        // Load tiles every 10 seconds.
+        setInterval(getTiles, 10000);
 
         server.ws({
           route: '/status/dashboard/socket',
           onOpen: async ws => {
-            async function sendStatuses() {
-              const services = await server.storage
-                .store('smartyellow/webservice')
-                .find({ public: true })
-                .toArray();
-              const heartbeats = await server.storage
-                .store('smartyellow/webserviceheartbeat')
-                .find({ webservice: { $in: services.map(s => s.id) } })
-                .sort({ date: -1 })
-                .toArray();
-              const tiles = [];
-
-              for (let service of services) {
-                const beat = heartbeats.find(b => b.webservice === service.id);
-                service = mapService(service, beat);
-                const tile = {
-                  service: service,
-                  serviceId: service.id,
-                  badges: [],
-                  prio: -1,
-                };
-
-                if (!beat) {
-                  tile.prio = -1; // no data (grey)
-                  tile.statusText = 'no data';
-                }
-                else if (beat.down) {
-                  tile.prio = 2; // down (red)
-                  tile.statusText = 'down';
-                  downIdsAfter.push(tile.serviceId);
-                }
-                else {
-                  tile.prio = 0; // ok (green)
-                  tile.statusText = 'ok';
-                }
-
-                tiles.push(tile);
-              }
-
-              // Let other plugins enrich dashboard tiles with custom badges and priorities.
-              await server.executePreHooks('populateDashboardTiles', { tiles });
-              await server.executePostHooks('populateDashboardTiles', { tiles });
-              await server.executePostHooks('pupulateDashboardTiles', { tiles }); // backwards compatibility
-
-              // Check if there are new outages and report them by ringing a bell on the dashboard.
-              newOutage = false;
-              for (const id of downIdsAfter) {
-                if (!downIdsBefore.includes(id)) {
-                  newOutage = true;
-                }
-              }
-              downIdsBefore = [ ...downIdsAfter ];
-              downIdsAfter = [];
-
+            function sendTiles() {
               try {
                 const json = JSON.stringify({ newOutage, tiles });
                 ws.send(json);
               }
-              catch {
-                return;
-              }
+              catch { /* noop */ }
             }
 
-            // Send statuses on open and every 5 seconds.
-            sendStatuses();
-            setInterval(sendStatuses, 5000);
+            // Send tiles on open and every 5 seconds.
+            sendTiles();
+            timers[ws.id] = setInterval(sendTiles, 5000);
           },
-          onUpgrade: async () => ({ id: makeId(10) }),
-          onMessage: async () => { /* do nothing */ },
+          onUpgrade: () => ({ id: makeId(10) }),
+          onMessage: () => { /* nevermind */ },
+          onClose: ws => {
+            clearInterval(timers[ws.id]);
+            delete timers[ws.id];
+          },
         });
       },
     },
