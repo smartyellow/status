@@ -50,12 +50,12 @@ async function processOutage({ outage, server, settings, onDateUpdated }) {
 
     // Encountered an error while checking status
     if (testResult.error) {
-      server.error('status: error while checking status of ' + id);
-      server.error(testResult);
+      server.warn('status: error while checking status of ' + id);
+      server.warn(testResult);
     }
 
-    // Service is down
-    else if (!testResult.serviceUp) {
+    // Service is down or unreachable
+    if (!testResult.serviceUp || testResult.error) {
       // Don't perform automatic actions if already done
       if ((lastBeat && lastBeat.down == false) || !lastBeat) {
         // Insert heartbeat if last one is not valid anymore
