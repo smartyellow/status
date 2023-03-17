@@ -495,7 +495,7 @@ module.exports = {
             + '</ul>';
 
           settings.emailRecipients.forEach(address => server.sendEmail({
-            subject: `[alert] ${tilesToNotifyAbout.size} web service${tilesToNotifyAbout.size === 1 ? '' : 's'} have a high priority!`,
+            subject: `[alert] ${tilesToNotifyAbout.size} web service${tilesToNotifyAbout.size === 1 ? ' has' : 's have'} a high priority!`,
             sender: settings.emailSender,
             to: address,
             body: message,
