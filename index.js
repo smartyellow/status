@@ -4,13 +4,14 @@ const { fork } = require('child_process');
 const { minifyHtml } = require('core/strings');
 const { readFile } = require('fs/promises');
 const { makeId } = require('core/makeid');
+
 const buildDeps = {
   rollup: require('rollup').rollup,
   commonjs: require('@rollup/plugin-commonjs'),
   css: require('rollup-plugin-css-only'),
   resolve: require('@rollup/plugin-node-resolve').nodeResolve,
   svelte: require('rollup-plugin-svelte'),
-  terser: require('rollup-plugin-terser').terser,
+  terser: require('@rollup/plugin-terser'),
 };
 
 const icons = {
